@@ -1,0 +1,81 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256" role="img" aria-labelledby="title desc">
+  <title>Urso de pelúcia verde — logo</title>
+  <desc>Ilustração minimalista de um urso de pelúcia verde com rosto fofo, em posição de salto, com sombra e linhas de movimento.</desc>
+
+  <style>
+    :root{
+      --bear: #22c55e;       /* verde principal */
+      --bear-dark: #16a34a;  /* verde escuro p/ detalhes */
+      --patch: #bbf7d0;      /* verde claro p/ barriguinha */
+      --stroke: #14532d;     /* contorno */
+      --cheek: #fecaca;      /* bochecha rosada */
+    }
+    .stroke{ stroke:var(--stroke); stroke-width:6; stroke-linecap:round; stroke-linejoin:round; vector-effect:non-scaling-stroke; }
+    .bear{ fill:var(--bear); }
+    .patch{ fill:var(--patch); }
+    .eye{ fill:#111; }
+    .highlight{ fill:#fff; opacity:.9; }
+    .cheek{ fill:var(--cheek); }
+    .dash{ stroke:var(--bear-dark); stroke-width:2.5; stroke-dasharray:6 8; fill:none; vector-effect:non-scaling-stroke; }
+    .shadow{ fill:#000; opacity:.12; }
+    .motion{ stroke:var(--bear-dark); stroke-width:5; fill:none; stroke-linecap:round; opacity:.5; vector-effect:non-scaling-stroke; }
+  </style>
+
+  <!-- sombra do salto -->
+  <ellipse class="shadow" cx="128" cy="228" rx="44" ry="10"/>
+
+  <!-- linhas de movimento -->
+  <path class="motion" d="M68 210c12-6 22-6 34 0"/>
+  <path class="motion" d="M154 214c10-5 18-5 28 0"/>
+
+  <!-- grupo do urso levemente inclinado para sugerir salto -->
+  <g transform="translate(0,-6) rotate(-6 128 128)">
+    <!-- orelhas -->
+    <g class="stroke">
+      <circle class="bear" cx="92" cy="62" r="18"/>
+      <circle class="bear" cx="164" cy="62" r="18"/>
+      <circle class="patch" cx="92" cy="64" r="9"/>
+      <circle class="patch" cx="164" cy="64" r="9"/>
+    </g>
+
+    <!-- cabeça -->
+    <circle class="bear stroke" cx="128" cy="92" r="46"/>
+
+    <!-- rosto fofo -->
+    <!-- olhos -->
+    <circle class="eye" cx="112" cy="86" r="6"/>
+    <circle class="eye" cx="144" cy="86" r="6"/>
+    <!-- brilhos dos olhos -->
+    <circle class="highlight" cx="110" cy="84" r="2"/>
+    <circle class="highlight" cx="142" cy="84" r="2"/>
+    <!-- bochechas -->
+    <circle class="cheek" cx="104" cy="100" r="6"/>
+    <circle class="cheek" cx="152" cy="100" r="6"/>
+    <!-- focinho -->
+    <ellipse cx="128" cy="100" rx="18" ry="14" fill="#fff"/>
+    <circle cx="128" cy="98" r="3.8" fill="#111"/>
+    <path d="M119 104q9 8 18 0" fill="none" stroke="#111" stroke-width="3" stroke-linecap="round" vector-effect="non-scaling-stroke"/>
+
+    <!-- corpo -->
+    <ellipse class="bear stroke" cx="128" cy="160" rx="48" ry="54"/>
+    <!-- barriguinha com costuras -->
+    <ellipse class="patch stroke" cx="128" cy="164" rx="28" ry="34"/>
+    <ellipse class="dash" cx="128" cy="164" rx="22" ry="28"/>
+
+    <!-- braços (para cima, como quem salta feliz) -->
+    <ellipse class="bear stroke" cx="84" cy="138" rx="16" ry="22" transform="rotate(-25 84 138)"/>
+    <ellipse class="bear stroke" cx="172" cy="138" rx="16" ry="22" transform="rotate(25 172 138)"/>
+
+    <!-- pernas -->
+    <ellipse class="bear stroke" cx="108" cy="198" rx="16" ry="20" transform="rotate(10 108 198)"/>
+    <ellipse class="bear stroke" cx="148" cy="198" rx="16" ry="20" transform="rotate(-10 148 198)"/>
+
+    <!-- pequenos pontos de “plush” (toque de pelúcia) -->
+    <g fill="none" stroke="var(--bear-dark)" stroke-linecap="round" stroke-width="3" opacity=".6" vector-effect="non-scaling-stroke">
+      <path d="M104 76c-3 2-6 4-9 6"/>
+      <path d="M152 76c3 2 6 4 9 6"/>
+      <path d="M118 184c-4 2-7 4-10 6"/>
+      <path d="M138 184c4 2 7 4 10 6"/>
+    </g>
+  </g>
+</svg>
