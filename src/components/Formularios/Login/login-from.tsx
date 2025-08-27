@@ -1,22 +1,21 @@
 "use client";
 
-import type React from "react";
-import { useState, useRef, useState as useReactState } from "react";
+import React, { useState } from "react";
 import { loginSchema } from "@/schema/login-schema";
 import type ILogin from "@/interface/ILogin";
 import { z } from "zod";
 import Link from "next/link";
-import { ChevronLeft, Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import LoginButton from "@/components/Botoes/Login/login-button";
+import GoogleLoginButton from "@/components/Botoes/Login/google-login-button";
 
-export default function LoginPage() {
+export default function LoginForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [form, setForm] = useState<ILogin>({ email: "", password: "" });
-  const [errors, setErrors] = useReactState<
-    Partial<Record<keyof ILogin, string>>
-  >({});
+  const [errors, setErrors] = useState<Partial<Record<keyof ILogin, string>>>({});
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -40,18 +39,6 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col">
-      {/* Header */}
-      <div className="flex items-center p-4">
-        <Link href="/">
-          <Button variant="ghost" size="icon" asChild>
-            <ChevronLeft className="h-6 w-6" />
-          </Button>
-        </Link>
-        <h1 className="ml-4 text-2xl font-semibold">Acessar conta</h1>
-      </div>
-
-      {/* Form */}
       <div className="flex-1 p-4 mt-4">
         <form onSubmit={handleSubmit} className="space-y-6 max-w-sm mx-auto">
           <div className="space-y-2">
@@ -70,7 +57,6 @@ export default function LoginPage() {
               <span className="text-sm text-red-500">{errors.email}</span>
             )}
           </div>
-
           <div className="space-y-2">
             <Label htmlFor="password">Senha</Label>
             <div className="relative">
@@ -102,7 +88,6 @@ export default function LoginPage() {
               <span className="text-sm text-red-500">{errors.password}</span>
             )}
           </div>
-
           <div className="text-right">
             <Link
               href="/esqueci-senha"
@@ -111,17 +96,13 @@ export default function LoginPage() {
               Esqueci a senha
             </Link>
           </div>
-        </form>
-      </div>
 
-      <form
-        className="w-full max-w-sm mx-auto px-4 pb-6 bg-white"
-        onSubmit={handleSubmit}
-      >
-        <Button type="submit" className="w-full h-12 text-base font-medium">
-          Acessar
-        </Button>
-      </form>
-    </div>
+          <GoogleLoginButton />
+
+          {/* Botão Login */}
+          <LoginButton texto="Acessar"/>
+        </form>
+
+      </div>
   );
 }

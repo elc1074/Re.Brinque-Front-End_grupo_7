@@ -3,18 +3,18 @@ import { MetadataRoute } from "next";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "Minha App",
-    short_name: "App",
+    name: "Re.Brinque",
+    short_name: "Re.Brinque",
     start_url: "/",
     scope: "/",
     display: "standalone",
-    background_color: "#ffffff",
-    theme_color: "#10b981",
+    background_color: "#316A41",
+    theme_color: "#316A41",
     icons: [
-      { src: "/icons/icon-192.png", sizes: "192x192", type: "image/png" },
-      { src: "/icons/icon-512.png", sizes: "512x512", type: "image/png" },
+      { src: "/assets/image.png", sizes: "192x192", type: "image/png" },
+      { src: "/icons/image.png", sizes: "512x512", type: "image/png" },
       {
-        src: "/icons/maskable-512.png",
+        src: "/assets/image.png",
         sizes: "512x512",
         type: "image/png",
         purpose: "any",
