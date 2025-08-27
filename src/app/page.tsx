@@ -29,7 +29,7 @@ export default function HomePage() {
       </div>
 
       {/* Footer fixo no final da tela */}
-      <footer className="bg-white dark:bg-zinc-800 border-t rounded-t-2xl p-6">
+      <footer className="bg-white dark:bg-zinc-800 border-t border-white dark:border-zinc-800 rounded-t-2xl p-6">
         <div className="flex flex-col gap-4">
           <Button asChild className="h-12 text-base font-medium bg-primary dark:text-white">
             <Link href="/login">Acessar minha conta</Link>
