@@ -1,6 +1,12 @@
 export default interface ICadastro {
-    name: string;
+    nome_completo: string;
     email: string;
-    password: string;
-    confirmPassword: string;
+    senha: string;
+    telefone: string;
+    confirmPassword?: string;
+}
+
+export interface ICadastroResponse {
+    message?: string;
+    error?: string;
 }

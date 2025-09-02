@@ -1,56 +1,35 @@
 "use client";
 
 import { useState } from "react";
-import { z } from "zod";
 import { Eye, EyeOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { cadastroSchema } from "@/schema/cadastro-schema";
-import type ICadastro from "@/interface/ICadastro";
+import { useCadastro } from "@/hooks/useCadastro";
 
-interface CadastroFormProps {
-  /** Dispara após validação OK (opcional) */
-  onSuccess?: (data: ICadastro) => void;
-};
-
-export default function CadastroForm({ onSuccess }: CadastroFormProps) {
+export default function CadastroForm() {
   const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [email, setEmail] = useState("");
+  const [senha, setSenha] = useState("");
+  const [nome_completo, setNome_completo] = useState("");
+  const [telefone, setTelefone] = useState("");
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
 
-  const [form, setForm] = useState<ICadastro>({
-    name: "",
-    email: "",
-    password: "",
-    confirmPassword: "",
-  });
-
-  const [errors, setErrors] = useState<
-    Partial<Record<keyof ICadastro, string>>
-  >({});
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setErrors({});
-
-    const result = cadastroSchema.safeParse(form);
-    if (!result.success) {
-      const fieldErrors: Partial<Record<keyof ICadastro, string>> = {};
-      result.error.issues.forEach((err: z.ZodIssue) => {
-        const field = err.path[0] as keyof ICadastro;
-        fieldErrors[field] = err.message;
-      });
-      setErrors(fieldErrors);
-      return;
+    setError("");
+    setSuccess("");
+    const res = await useCadastro(nome_completo, email, telefone, senha);
+    if (res.message) {
+      setSuccess(res.message);
+      setEmail("");
+      setNome_completo("");
+      setSenha("");
+    } else {
+      setError(res.error || "Erro ao cadastrar");
     }
-
-    // Se passou na validação
-    console.log("Cadastro:", form);
-    onSuccess?.(form);
   };
 
   return (
@@ -65,14 +44,8 @@ export default function CadastroForm({ onSuccess }: CadastroFormProps) {
           name="name"
           type="text"
           placeholder="Digite seu nome"
-          value={form.name}
-          onChange={handleChange}
           required
-          aria-invalid={!!errors.name}
         />
-        {errors.name && (
-          <span className="text-sm text-red-500">{errors.name}</span>
-        )}
       </div>
 
       <div className="space-y-2">
@@ -82,14 +55,19 @@ export default function CadastroForm({ onSuccess }: CadastroFormProps) {
           name="email"
           type="email"
           placeholder="Digite seu e-mail"
-          value={form.email}
-          onChange={handleChange}
           required
-          aria-invalid={!!errors.email}
         />
-        {errors.email && (
-          <span className="text-sm text-red-500">{errors.email}</span>
-        )}
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="telefone">Telefone</Label>
+        <Input
+          id="telefone"
+          name="telefone"
+          type="number"
+          placeholder="(99) 99999-9999"
+          required
+        />
       </div>
 
       <div className="space-y-2">
@@ -100,10 +78,7 @@ export default function CadastroForm({ onSuccess }: CadastroFormProps) {
             name="password"
             type={showPassword ? "text" : "password"}
             placeholder="Crie uma senha"
-            value={form.password}
-            onChange={handleChange}
             required
-            aria-invalid={!!errors.password}
           />
           <Button
             type="button"
@@ -120,15 +95,9 @@ export default function CadastroForm({ onSuccess }: CadastroFormProps) {
             )}
           </Button>
         </div>
-        {errors.password && (
-          <span className="text-sm text-red-500">{errors.password}</span>
-        )}
-        <p className="text-xs text-muted-foreground">
-          Deve conter no mínimo 8 caracteres
-        </p>
       </div>
 
-      <div className="space-y-2">
+      {/* <div className="space-y-2">
         <Label htmlFor="confirmPassword">Confirmar senha</Label>
         <div className="relative">
           <Input
@@ -163,7 +132,7 @@ export default function CadastroForm({ onSuccess }: CadastroFormProps) {
         {errors.confirmPassword && (
           <span className="text-sm text-red-500">{errors.confirmPassword}</span>
         )}
-      </div>
+      </div> */}
 
       <Button type="submit" className="w-full h-12 text-base font-medium">
         Criar conta
