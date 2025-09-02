@@ -1,4 +1,3 @@
-// app/manifest.ts
 import { MetadataRoute } from "next";
 
 export default function manifest(): MetadataRoute.Manifest {
@@ -6,19 +5,11 @@ export default function manifest(): MetadataRoute.Manifest {
     name: "Re.Brinque",
     short_name: "Re.Brinque",
     start_url: "/",
-    scope: "/",
+    lang: "pt-BR",
+    description: "Aplicativo de doação e troca de brinquedos",
     display: "standalone",
     background_color: "#316A41",
     theme_color: "#316A41",
-    icons: [
-      { src: "/icons/image.png", sizes: "192x192", type: "image/png" },
-      { src: "/icons/image.png", sizes: "512x512", type: "image/png" },
-      {
-        src: "/icons/image.png",
-        sizes: "512x512",
-        type: "image/png",
-        purpose: "any",
-      },
-    ],
+    icons: [{ src: "/favicon.ico", sizes: "any", type: "image/x-icon" }],
   };
 }

@@ -11,7 +11,7 @@ export const cadastroSchema = z
       .min(10, { message: "Informe um telefone válido" }),
     senha: z
       .string()
-      .min(8, { message: "A senha deve ter pelo menos 8 caracteres" }),
+      .min(6, { message: "A senha deve ter pelo menos 6 caracteres" }),
     // confirmPassword: z
     //   .string()
     //   .min(8, { message: "A senha deve ter pelo menos 8 caracteres" }),
@@ -22,4 +22,3 @@ export const cadastroSchema = z
   // });
 
 export type CadastroSchema = z.infer<typeof cadastroSchema>;
-

@@ -1,5 +1,6 @@
-import { URL_API } from "@/lib/api";
 import ICadastro, { ICadastroResponse } from "@/interface/ICadastro";
+
+const URL_API = process.env.NEXT_PUBLIC_API_URL;
 
 export async function useCadastro(
   nome_completo: ICadastro["nome_completo"],
@@ -8,7 +9,7 @@ export async function useCadastro(
   senha: ICadastro["senha"]
 ): Promise<ICadastroResponse> {
   try {
-    const response = await fetch(`${URL_API}/usuarios`, {
+    const response = await fetch(`${URL_API}/api/auth/register`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
