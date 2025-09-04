@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
 import { Eye, EyeOff, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -37,6 +36,20 @@ export default function LoginForm() {
       const data = await login(values);
       if (data?.message) {
         toast.success(data.message);
+        // Salvar dados nos cookies
+        const cookieResponse = await fetch("/api/set-cookie", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            token: data.token,
+            id: data.usuario?.id,
+            nome: data.usuario?.nome,
+            email: data.usuario?.email,
+          }),
+        });
+        if (!cookieResponse.ok) {
+          throw new Error("Erro ao definir o cookie");
+        }
         router.push("/tela-inicial");
       }
       if (data?.error) toast.error(data.error);
@@ -74,7 +87,7 @@ export default function LoginForm() {
           <div className="relative">
             <Input
               id="senha"
-              type={showSenha ? "text" : "senha"}
+              type={showSenha ? "text" : "password"}
               placeholder="**********"
               {...register("senha")}
               required
@@ -104,19 +117,22 @@ export default function LoginForm() {
         </div>
 
         <div className="text-right">
-          <Link
-            href="/esqueci-senha"
+          <Button
+            variant="link"
             className="text-sm text-primary hover:underline"
+            onClick={() => toast.warning("Funcionalidade em desenvolvimento")}
           >
             Esqueci a senha
-          </Link>
+          </Button>
         </div>
 
-        <GoogleLoginButton />
+        <div className="pt-8">
+          <GoogleLoginButton />
+        </div>
 
         <Button
           type="submit"
-          className="w-full h-12 text-base font-medium"
+          className="h-12 text-base font-medium fixed bottom-4 left-1/2 transform -translate-x-1/2 max-w-sm w-full px-4"
           disabled={isPending}
           aria-busy={isPending}
         >

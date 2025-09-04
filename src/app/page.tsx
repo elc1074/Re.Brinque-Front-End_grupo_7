@@ -6,18 +6,20 @@ import { ModeToggle } from "@/components/ui/mode-toggle";
 
 export default function HomePage() {
   return (
-    <div className="bg-zinc-100 dark:bg-primary min-h-screen max-h-screen flex flex-col">
+    <div className="bg-zinc-100 dark:bg-primary min-h-dvh flex flex-col">
       {/* Conteúdo principal */}
       <div className="flex-1 flex flex-col items-center justify-center text-center px-4">
         <section className="absolute top-4 right-4">
-          <ModeToggle className="text-primary dark:text-white"/>
+          <ModeToggle className="text-primary dark:text-white" />
         </section>
         <div className="flex items-center justify-center">
           <Image src={logo} width={150} height={150} alt="Logo re.Brinque" />
         </div>
 
         <div className="space-y-2 mt-6">
-          <h1 className="text-3xl font-bold text-primary dark:text-white">re.Brinque</h1>
+          <h1 className="text-3xl font-bold text-primary dark:text-white">
+            re.Brinque
+          </h1>
           <p className="text-muted-foreground dark:text-white text-sm mt-12">
             Pais espertos não compram tudo. <br />
             Compartilham brinquedos!
@@ -31,7 +33,10 @@ export default function HomePage() {
       {/* Footer fixo no final da tela */}
       <footer className="bg-white dark:bg-zinc-800 border-t border-white dark:border-zinc-800 rounded-t-2xl p-6">
         <div className="flex flex-col gap-4">
-          <Button asChild className="h-12 text-base font-medium bg-primary dark:text-white">
+          <Button
+            asChild
+            className="h-12 text-base font-medium bg-primary dark:text-white"
+          >
             <Link href="/login">Acessar minha conta</Link>
           </Button>
           <Button

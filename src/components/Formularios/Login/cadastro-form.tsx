@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Eye, EyeOff, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,29 +11,32 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { cadastroSchema } from "@/schema/cadastro-schema";
 import { z } from "zod";
 import { useCadastro } from "@/hooks/useCadastro";
+import { maskTelefone } from "@/lib/maskTelefone";
 import { toast } from "sonner";
 
 type CadastroFormValues = z.infer<typeof cadastroSchema>;
 
 export default function CadastroForm() {
-  const { register, handleSubmit } = useForm({
+  const { register, handleSubmit, setValue } = useForm({
     resolver: zodResolver(cadastroSchema),
   });
   const [showSenha, setShowSenha] = useState(false);
+  const router = useRouter();
 
-const { cadastrar, isPending } = useCadastro();
+  const { cadastrar, isPending } = useCadastro();
 
-async function onSubmit(values: CadastroFormValues) {
-  try {
-    const data = await cadastrar(values);
-    if (data?.message) toast.success(data.message);
-    if (data?.error) toast.error(data.error);
-  } catch (e: any) {
-    toast.error(e.message);
+  async function onSubmit(values: CadastroFormValues) {
+    try {
+      const data = await cadastrar(values);
+      if (data?.message) {
+        toast.success(data.message);
+        router.push("/login");
+      }
+      if (data?.error) toast.error(data.error);
+    } catch (e: any) {
+      toast.error(e.message);
+    }
   }
-}
-
-
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
@@ -64,10 +68,14 @@ async function onSubmit(values: CadastroFormValues) {
         <Label htmlFor="telefone">Telefone</Label>
         <Input
           id="telefone"
-          {...register("telefone")}
           type="tel"
           placeholder="(99) 99999-9999"
           required
+          {...register("telefone")}
+          onChange={(e) => {
+            const masked = maskTelefone(e.target.value);
+            setValue("telefone", masked);
+          }}
         />
       </div>
 
@@ -77,7 +85,7 @@ async function onSubmit(values: CadastroFormValues) {
           <Input
             id="senha"
             {...register("senha")}
-            type={showSenha ? "text" : "senha"}
+            type={showSenha ? "text" : "password"}
             placeholder="**********"
             required
           />
@@ -98,21 +106,20 @@ async function onSubmit(values: CadastroFormValues) {
         </div>
       </div>
       <Button
-          type="submit"
-          className="w-full h-12 text-base font-medium"
-          disabled={isPending}
-          aria-busy={isPending}
-        >
-          {isPending ? (
-            <>
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              Criando…
-            </>
-          ) : (
-            "Criar conta"
-          )}
-        </Button>
-
+        type="submit"
+        className="h-12 text-base font-medium fixed bottom-4 left-1/2 transform -translate-x-1/2 max-w-sm w-full px-4"
+        disabled={isPending}
+        aria-busy={isPending}
+      >
+        {isPending ? (
+          <>
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            Criando…
+          </>
+        ) : (
+          "Criar conta"
+        )}
+      </Button>
     </form>
   );
 }
