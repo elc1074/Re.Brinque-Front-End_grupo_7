@@ -6,7 +6,7 @@ import { ModeToggle } from "@/components/ui/mode-toggle";
 
 export default function HomePage() {
   return (
-    <div className="bg-zinc-100 dark:bg-primary min-h-screen flex flex-col">
+    <div className="bg-zinc-100 dark:bg-primary min-h-screen max-h-screen flex flex-col">
       {/* Conteúdo principal */}
       <div className="flex-1 flex flex-col items-center justify-center text-center px-4">
         <section className="absolute top-4 right-4">

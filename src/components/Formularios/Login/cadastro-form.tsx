@@ -1,7 +1,7 @@
 "use client";
 
-import { use, useState } from "react";
-import { Eye, EyeOff } from "lucide-react";
+import { useState } from "react";
+import { Eye, EyeOff, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -10,22 +10,32 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { cadastroSchema } from "@/schema/cadastro-schema";
 import { z } from "zod";
 import { useCadastro } from "@/hooks/useCadastro";
+import { toast } from "sonner";
 
-type cadastroSchema = z.infer<typeof cadastroSchema>;
+type CadastroFormValues = z.infer<typeof cadastroSchema>;
 
 export default function CadastroForm() {
   const { register, handleSubmit } = useForm({
     resolver: zodResolver(cadastroSchema),
   });
-  const [showPassword, setShowPassword] = useState(false);
+  const [showSenha, setShowSenha] = useState(false);
 
-  function handleCadastro(data: cadastroSchema) {
-    useCadastro(data.nome_completo, data.email, data.telefone, data.senha);
+const { cadastrar, isPending } = useCadastro();
+
+async function onSubmit(values: CadastroFormValues) {
+  try {
+    const data = await cadastrar(values);
+    if (data?.message) toast.success(data.message);
+    if (data?.error) toast.error(data.error);
+  } catch (e: any) {
+    toast.error(e.message);
   }
+}
+
 
   return (
     <form
-      onSubmit={handleSubmit(handleCadastro)}
+      onSubmit={handleSubmit(onSubmit)}
       className="space-y-6 max-w-sm mx-auto w-full px-4 pb-6"
     >
       <div className="space-y-2">
@@ -62,12 +72,12 @@ export default function CadastroForm() {
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="password">Senha</Label>
+        <Label htmlFor="senha">Senha</Label>
         <div className="relative">
           <Input
             id="senha"
             {...register("senha")}
-            type={showPassword ? "text" : "password"}
+            type={showSenha ? "text" : "senha"}
             placeholder="**********"
             required
           />
@@ -76,10 +86,10 @@ export default function CadastroForm() {
             variant="ghost"
             size="icon"
             className="absolute right-0 top-0 h-full px-3"
-            onClick={() => setShowPassword(!showPassword)}
-            aria-label={showPassword ? "Ocultar senha" : "Mostrar senha"}
+            onClick={() => setShowSenha(!showSenha)}
+            aria-label={showSenha ? "Ocultar senha" : "Mostrar senha"}
           >
-            {showPassword ? (
+            {showSenha ? (
               <EyeOff className="h-4 w-4" />
             ) : (
               <Eye className="h-4 w-4" />
@@ -87,10 +97,22 @@ export default function CadastroForm() {
           </Button>
         </div>
       </div>
+      <Button
+          type="submit"
+          className="w-full h-12 text-base font-medium"
+          disabled={isPending}
+          aria-busy={isPending}
+        >
+          {isPending ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              Criando…
+            </>
+          ) : (
+            "Criar conta"
+          )}
+        </Button>
 
-      <Button type="submit" className="w-full h-12 text-base font-medium">
-        Criar conta
-      </Button>
     </form>
   );
 }
