@@ -11,7 +11,7 @@ export default function GoogleLoginButton() {
   const handleGoogleLogin = async () => {
     await authClient.signIn.social({
       provider: "google",
-      callbackURL: "http://localhost:3000",
+      callbackURL: "https://front-re-brinque.vercel.app",
     });
   };
   return (

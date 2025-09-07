@@ -40,7 +40,7 @@ export default function CadastroForm() {
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
-      className="space-y-6 max-w-sm mx-auto w-full px-4 pb-6"
+      className="space-y-6 max-w-sm mx-auto w-full px-4 pb-6 mt-10"
     >
       <div className="space-y-2">
         <Label htmlFor="nome_completo">Nome</Label>

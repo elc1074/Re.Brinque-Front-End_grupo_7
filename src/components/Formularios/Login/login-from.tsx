@@ -59,10 +59,9 @@ export default function LoginForm() {
   }
 
   return (
-    <div className="flex-1 p-4 mt-4">
       <form
         onSubmit={handleSubmit(onSubmit)}
-        className="space-y-6 max-w-sm mx-auto"
+        className="space-y-6 max-w-sm mx-auto w-full px-4 pb-6 mt-10"
       >
         <div className="space-y-2">
           <Label htmlFor="email">E-mail</Label>
@@ -139,13 +138,12 @@ export default function LoginForm() {
           {isPending ? (
             <>
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              Entrando…
+              Entrando...
             </>
           ) : (
             "Acessar"
           )}
         </Button>
       </form>
-    </div>
   );
 }

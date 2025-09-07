@@ -13,8 +13,8 @@ interface HeaderLoginProps {
 export default function HeaderLogin({ title }: HeaderLoginProps) {
   return (
     <div className="flex items-center p-4">
-      <section className="absolute top-4 right-4">
-        <ModeToggle className="text-primary dark:text-white" />
+      <section className="absolute top-8 right-4">
+        <ModeToggle className="text-primary" />
       </section>
       <Link href="/">
         <Button variant="ghost" size="icon" asChild>
