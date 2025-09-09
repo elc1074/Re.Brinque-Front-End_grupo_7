@@ -51,6 +51,9 @@ export default function CriarAnuncioForm({ usuario_id }: { usuario_id: number })
   } = useForm<CriarAnuncioSchemaType>({
     resolver: zodResolver(criarAnuncioSchema),
     defaultValues: {
+      // ---------------------------- verificar o schema e colocar os valores corretos ---------------------------- //
+      // ----------------------------------- depois ajustar os formulários ---------------------------------------- //
+
       preco: "",
       titulo: "",
       marca: "",
