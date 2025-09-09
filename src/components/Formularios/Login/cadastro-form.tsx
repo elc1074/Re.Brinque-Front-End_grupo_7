@@ -17,13 +17,19 @@ import { toast } from "sonner";
 type CadastroFormValues = z.infer<typeof cadastroSchema>;
 
 export default function CadastroForm() {
-  const { register, handleSubmit, setValue } = useForm({
-    resolver: zodResolver(cadastroSchema),
-  });
   const [showSenha, setShowSenha] = useState(false);
   const router = useRouter();
-
   const { cadastrar, isPending } = useCadastro();
+
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    formState: { errors },
+  } = useForm<CadastroFormValues>({
+    resolver: zodResolver(cadastroSchema),
+    defaultValues: { nome_completo: "", email: "", telefone: "", senha: "" },
+  });
 
   async function onSubmit(values: CadastroFormValues) {
     try {
@@ -50,7 +56,16 @@ export default function CadastroForm() {
           type="text"
           placeholder="Digite seu nome"
           required
+          aria-invalid={!!errors.nome_completo}
+          aria-describedby={
+            errors.nome_completo ? "nome_completo-error" : undefined
+          }
         />
+        {errors.nome_completo && (
+          <span id="nome_completo-error" className="text-sm text-red-500">
+            {errors.nome_completo.message}
+          </span>
+        )}
       </div>
 
       <div className="space-y-2">
@@ -61,7 +76,14 @@ export default function CadastroForm() {
           type="email"
           placeholder="Digite seu e-mail"
           required
+          aria-invalid={!!errors.email}
+          aria-describedby={errors.email ? "email-error" : undefined}
         />
+        {errors.email && (
+          <span id="email-error" className="text-sm text-red-500">
+            {errors.email.message}
+          </span>
+        )}
       </div>
 
       <div className="space-y-2">
@@ -76,7 +98,14 @@ export default function CadastroForm() {
             const masked = maskTelefone(e.target.value);
             setValue("telefone", masked);
           }}
+          aria-invalid={!!errors.telefone}
+          aria-describedby={errors.telefone ? "telefone-error" : undefined}
         />
+        {errors.telefone && (
+          <span id="telefone-error" className="text-sm text-red-500">
+            {errors.telefone.message}
+          </span>
+        )}
       </div>
 
       <div className="space-y-2">
@@ -104,6 +133,11 @@ export default function CadastroForm() {
             )}
           </Button>
         </div>
+        {errors.senha && (
+          <span id="senha-error" className="text-sm text-red-500">
+            {errors.senha.message}
+          </span>
+        )}
       </div>
       <Button
         type="submit"

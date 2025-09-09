@@ -26,7 +26,7 @@ export default function LoginForm() {
     formState: { errors },
   } = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
-    defaultValues: { email: "", senha: "" },
+    defaultValues: { email: "", senha: "" }
   });
 
   const { login, isPending } = useLogin();

@@ -14,7 +14,7 @@ export async function POST(req: NextRequest) {
     secure: true, // apenas HTTPS
     sameSite: "strict", // evita ataques CSRF
     path: "/",
-    maxAge: 60 * 60 * 24 * 7, // 1 semana
+  maxAge: 60 * 60, // 1 hora
   });
 
 
@@ -23,21 +23,21 @@ export async function POST(req: NextRequest) {
     secure: true,
     sameSite: "strict",
     path: "/",
-    maxAge: 60 * 60 * 24 * 7,
+  maxAge: 60 * 60,
   });
 
   response.cookies.set("nome", nome, {
     secure: true,
     sameSite: "strict",
     path: "/",
-    maxAge: 60 * 60 * 24 * 7,
+  maxAge: 60 * 60,
   });
 
   response.cookies.set("email", email, {
     secure: true,
     sameSite: "strict",
     path: "/",
-    maxAge: 60 * 60 * 24 * 7,
+  maxAge: 60 * 60,
   });
 
   return response;

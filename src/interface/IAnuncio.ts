@@ -1,10 +1,16 @@
-export interface IAnuncio {
-  usuario_id: any;
-  categoria_id: any;
-  endereco_id: any;
-  titulo: any;
-  descricao: any;
-  tipo: any;
-  condicao: any;
-  status: any;
+export default interface IAnuncio {
+  usuario_id: number;
+  categoria_id: number;
+  endereco_id: number;
+  titulo: string;
+  descricao: string;
+  tipo: "TROCA" | "DOACAO";
+  condicao: "NOVO" | "USADO";
+  status: "DISPONIVEL" | "NEGOCIANDO" | "FINALIZADO";
+  imagens?: string[];
+}
+
+export interface IAnuncioResponse {
+  message?: string;
+  error?: string;
 }
