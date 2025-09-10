@@ -1,14 +1,14 @@
 export default interface IAnuncio {
   usuario_id: number;
-  titulo: string;
-  marca: string | null;
-  descricao: string;
-  tipo: "TROCA" | "DOACAO";
-  condicao: "NOVO" | "USADO";
   categoria_id: number;
+  titulo: string;
+  descricao: string;
+  marca: string | null;
+  endereco_completo?: string | null;
+  tipo: "TROCA" | "DOACAO";
+  condicao: "NOVO" | "SEMINOVO" | "USADO";
   status: "DISPONIVEL" | "NEGOCIANDO" | "FINALIZADO";
-  endereco_id: number;
-  imagens?: string[];
+  imagens?: string[] | null;
 }
 
 export interface IAnuncioResponse {

@@ -10,7 +10,7 @@ export async function POST(req: NextRequest) {
 
   // Definir cookie de forma segura
   response.cookies.set("token", token, {
-    httpOnly: true, // inacessível ao JS, protegido contra ataques XSS
+    //httpOnly: true, // inacessível ao JS, protegido contra ataques XSS
     secure: true, // apenas HTTPS
     sameSite: "strict", // evita ataques CSRF
     path: "/",

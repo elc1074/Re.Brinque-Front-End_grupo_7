@@ -1,13 +1,14 @@
-
 import IAnuncio, { IAnuncioResponse } from "@/interface/IAnuncio";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query"
 
 const URL_API = process.env.NEXT_PUBLIC_API_URL;
 
 async function criarAnuncioRequest(data: IAnuncio): Promise<IAnuncioResponse> {
   try {
-    // Token do usuário deve ser passado pelo client (ex: via cookie ou header)
-    const token = typeof document !== "undefined" ? document.cookie.match(/token=([^;]+)/)?.[1] : undefined;
+const token =
+  typeof document !== "undefined"
+    ? document.cookie.match(/token=([^;]+)/)?.[1]
+    : undefined;
 
     const headers: Record<string, string> = {
       "Content-Type": "application/json",

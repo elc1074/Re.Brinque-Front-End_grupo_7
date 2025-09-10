@@ -8,10 +8,9 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Checkbox } from "@/components/ui/checkbox";
 import { ArrowLeft, X } from "lucide-react";
 import { useAnuncioMutation } from "@/hooks/useAnuncio";
-import z from "zod";
+import { z } from "zod";
 import Link from "next/link";
 import {
   criarAnuncioSchema,
@@ -51,18 +50,12 @@ export default function CriarAnuncioForm({ usuario_id }: { usuario_id: number })
   } = useForm<CriarAnuncioSchemaType>({
     resolver: zodResolver(criarAnuncioSchema),
     defaultValues: {
-      // ---------------------------- verificar o schema e colocar os valores corretos ---------------------------- //
-      // ----------------------------------- depois ajustar os formulários ---------------------------------------- //
-
-      preco: "",
+      categoria_id: null,
       titulo: "",
-      marca: "",
+      marca: null,
       condicao: undefined,
       descricao: "",
-      categoria_id: null,
-      disponibilizarDoacao: false,
-      aceitarTrocas: false,
-      status: "ATIVO",
+      status: "DISPONIVEL",
     },
   });
   const formData = watch();
@@ -75,27 +68,26 @@ export default function CriarAnuncioForm({ usuario_id }: { usuario_id: number })
     if (step > 1) setStep(step - 1);
   };
 
-  const {
-    criarAnuncio,
-    isPending,
-    isSuccess,
-    isError,
-    error,
-    data,
-  } = useAnuncioMutation();
+  const { criarAnuncio, isPending } = useAnuncioMutation();
+
   async function onSubmit(values: CriarAnuncioSchemaType) {
+    const payload = {
+      ...values,
+      usuario_id,
+      categoria_id: values.categoria_id as number,
+      marca: values.marca !== undefined ? values.marca : null,
+      tipo:
+        values.tipo === "TROCA" || values.tipo === "DOACAO"
+          ? values.tipo
+          : "TROCA",
+    };
     try {
-      const payload = {
-        ...values,
-        usuario_id,
-      };
       const result = await criarAnuncio(payload);
-      if (result?.message) {
-        toast.success(result.message);
+        toast.success("Anúncio criado com sucesso!");
         router.push("/tela-inicial");
-      }
       if (result?.error) toast.error(result.error);
     } catch (e: any) {
+      console.error("Erro ao criar anúncio:", e);
       toast.error(e.message);
     }
   }
@@ -105,12 +97,12 @@ export default function CriarAnuncioForm({ usuario_id }: { usuario_id: number })
       case 1:
         return (
           <div className="space-y-6">
-            <h2 className="text-lg font-medium">Dê um título ao seu anúncio</h2>
-            <div className="space-y-2">
+            <div className="space-y-4">
+              <Label className="text-lg">Dê um título ao seu anúncio</Label>
               <Input
                 placeholder="ex.: Brinquedo Pelúcia Leãozinho"
                 {...register("titulo")}
-                className="bg-gray-100 border-0 text-lg p-4"
+                className="bg-gray-100 text-lg p-4"
                 maxLength={100}
               />
               <p className="text-sm text-gray-500">
@@ -127,12 +119,12 @@ export default function CriarAnuncioForm({ usuario_id }: { usuario_id: number })
       case 2:
         return (
           <div className="space-y-6">
-            <h2 className="text-lg font-medium">Descreva seu produto</h2>
+            <Label className="text-lg font-medium">Descreva seu produto</Label>
             <div className="space-y-2">
               <Textarea
                 placeholder="ex.: Pelúcia Leãozinho com plush macio, cor marrom clássica, antialérgico e tamanho 25cm"
                 {...register("descricao")}
-                className="bg-gray-100 border-0 text-lg p-4 min-h-32 resize-none"
+                className="bg-gray-100 text-lg p-4 min-h-32 resize-none"
                 maxLength={350}
               />
               <p className="text-sm text-gray-500">
@@ -149,23 +141,27 @@ export default function CriarAnuncioForm({ usuario_id }: { usuario_id: number })
       case 3:
         return (
           <div className="space-y-6">
-            <h2 className="text-lg font-medium">Selecione a condição de uso</h2>
+            <Label className="text-lg font-medium">
+              Selecione a condição de uso
+            </Label>
             <RadioGroup
               value={formData.condicao}
               onValueChange={(value) =>
-                setValue("condicao", value as "novo" | "usado")
+                setValue("condicao", value as "NOVO" | "USADO", {
+                  shouldValidate: true,
+                })
               }
               className="space-y-4"
             >
-              <div className="flex items-center space-x-3 p-4 border rounded-lg">
-                <RadioGroupItem value="novo" id="novo" />
-                <Label htmlFor="novo" className="text-lg">
+              <div className="flex items-center space-x-3 p-4 border rounded-lg dark:border-primary">
+                <RadioGroupItem value="NOVO" id="condicao-novo" />
+                <Label htmlFor="condicao-novo" className="text-lg">
                   Novo
                 </Label>
               </div>
-              <div className="flex items-center space-x-3 p-4 border rounded-lg">
-                <RadioGroupItem value="usado" id="usado" />
-                <Label htmlFor="usado" className="text-lg">
+              <div className="flex items-center space-x-3 p-4 border rounded-lg dark:border-primary">
+                <RadioGroupItem value="USADO" id="condicao-usado" />
+                <Label htmlFor="condicao-usado" className="text-lg">
                   Usado
                 </Label>
               </div>
@@ -180,19 +176,23 @@ export default function CriarAnuncioForm({ usuario_id }: { usuario_id: number })
       case 4:
         return (
           <div className="space-y-6">
-            <h2 className="text-lg font-medium">
+            <Label className="text-lg font-medium">
               Escolha a categoria do brinquedo
-            </h2>
+            </Label>
             <div className="grid grid-cols-2 gap-3">
               {categorias.map((categoria) => (
                 <button
                   key={categoria.id}
                   type="button"
-                  onClick={() => setValue("categoria_id", categoria.id)}
+                  onClick={() =>
+                    setValue("categoria_id", categoria.id, {
+                      shouldValidate: true,
+                    })
+                  }
                   className={`p-4 rounded-lg border text-left transition-colors ${
                     formData.categoria_id === categoria.id
-                      ? "bg-green-50 border-green-500"
-                      : "bg-gray-50 border-gray-200"
+                      ? "bg-green-50 border-green-500 dark:bg-green-900/30 dark:border-green-700"
+                      : "bg-gray-50 border-gray-200 dark:bg-zinc-800 dark:border-zinc-700"
                   }`}
                 >
                   <div className="flex items-center space-x-2">
@@ -212,17 +212,19 @@ export default function CriarAnuncioForm({ usuario_id }: { usuario_id: number })
       case 5:
         return (
           <div className="space-y-6">
-            <h2 className="text-lg font-medium">Adicione a marca do produto</h2>
+            <Label className="text-lg font-medium">
+              Adicione a marca do produto
+            </Label>
             <Input
               placeholder="ex.: Mattel"
               {...register("marca")}
-              className="bg-gray-100 border-0 text-lg p-4"
+              className="bg-gray-100 text-lg p-4"
             />
             <Button
               variant="ghost"
               className="w-full text-gray-600"
               type="button"
-              onClick={() => setValue("marca", "")}
+              onClick={() => setValue("marca", null, { shouldValidate: true })}
             >
               Sem marca
             </Button>
@@ -236,58 +238,36 @@ export default function CriarAnuncioForm({ usuario_id }: { usuario_id: number })
       case 6:
         return (
           <div className="space-y-6">
-            <h2 className="text-lg font-medium">
-              Adicione um preço ao anúncio
-            </h2>
-            <div className="space-y-4">
-              <Input
-                placeholder="R$"
-                {...register("preco")}
-                className="bg-gray-100 border-0 text-lg p-4"
-              />
-              {errors.preco && (
-                <span className="text-red-500 text-sm">
-                  {errors.preco.message}
-                </span>
-              )}
-              <div className="text-center text-gray-500">ou</div>
-              <div className="space-y-4">
-                <div className="flex items-center space-x-3">
-                  <Checkbox
-                    id="doacao"
-                    checked={formData.disponibilizarDoacao}
-                    onCheckedChange={(checked) =>
-                      setValue("disponibilizarDoacao", checked as boolean)
-                    }
-                  />
-                  <div>
-                    <Label htmlFor="doacao" className="font-medium">
-                      Disponibilizar para doação
-                    </Label>
-                    <p className="text-sm text-gray-500">
-                      Seu produto será gratuito
-                    </p>
-                  </div>
-                </div>
-                <div className="flex items-center space-x-3">
-                  <Checkbox
-                    id="trocas"
-                    checked={formData.aceitarTrocas}
-                    onCheckedChange={(checked) =>
-                      setValue("aceitarTrocas", checked as boolean)
-                    }
-                  />
-                  <div>
-                    <Label htmlFor="trocas" className="font-medium">
-                      Aceitar trocas
-                    </Label>
-                    <p className="text-sm text-gray-500">
-                      Seu produto será gratuito
-                    </p>
-                  </div>
-                </div>
+            <Label className="text-lg font-medium">
+              Selecione o tipo do anúncio
+            </Label>
+            <RadioGroup
+              value={formData.tipo}
+              onValueChange={(value) =>
+                setValue("tipo", value as "TROCA" | "DOACAO", {
+                  shouldValidate: true,
+                })
+              }
+              className="space-y-4"
+            >
+              <div className="flex items-center space-x-3 p-4 border rounded-lg dark:border-primary">
+                <RadioGroupItem value="TROCA" id="tipo-troca" />
+                <Label htmlFor="tipo-troca" className="text-lg">
+                  Troca
+                </Label>
               </div>
-            </div>
+              <div className="flex items-center space-x-3 p-4 border rounded-lg dark:border-primary">
+                <RadioGroupItem value="DOACAO" id="tipo-doacao" />
+                <Label htmlFor="tipo-doacao" className="text-lg">
+                  Doação
+                </Label>
+              </div>
+            </RadioGroup>
+            {errors.tipo && (
+              <span className="text-red-500 text-sm">
+                {errors.tipo.message}
+              </span>
+            )}
           </div>
         );
       default:
@@ -308,19 +288,15 @@ export default function CriarAnuncioForm({ usuario_id }: { usuario_id: number })
       case 5:
         return true;
       case 6:
-        return (
-          formData.preco ||
-          formData.disponibilizarDoacao ||
-          formData.aceitarTrocas
-        );
+        return formData.tipo === "TROCA" || formData.tipo === "DOACAO";
       default:
-        return false;
+        return formData.tipo === "TROCA" || formData.tipo === "DOACAO";
     }
   };
 
   return (
     <form
-      className="min-h-screen bg-white flex flex-col"
+      className="min-h-dvh bg-background flex flex-col"
       onSubmit={handleSubmit(onSubmit)}
     >
       {/* Header */}
@@ -337,7 +313,7 @@ export default function CriarAnuncioForm({ usuario_id }: { usuario_id: number })
         </div>
         <Link href="/tela-inicial">
           <Button variant="link" size="icon" type="button">
-            <X className="text-zinc-500" />
+            <X className="!size-5 text-zinc-500 dark:text-white" />
           </Button>
         </Link>
       </header>
@@ -356,19 +332,25 @@ export default function CriarAnuncioForm({ usuario_id }: { usuario_id: number })
       <div className="flex-1 p-6">{renderStep()}</div>
 
       {/* Footer */}
-      <div className="p-6 border-t">
-        <Button
-          onClick={step === 6 ? undefined : handleNext}
-          disabled={!canProceed() || isPending}
-          className="w-full bg-primary text-white py-4 text-lg font-medium"
-          type={step === 6 ? "submit" : "button"}
-        >
-          {isPending
-            ? "Criando..."
-            : step === 6
-            ? "Criar Anúncio"
-            : "Continuar"}
-        </Button>
+      <div className="p-6">
+        {step === 6 ? (
+          <Button
+            disabled={!canProceed() || isPending}
+            className="w-full h-12 text-base font-medium dark:text-white mb-4"
+            type="submit"
+          >
+            {isPending ? "Criando..." : "Criar Anúncio"}
+          </Button>
+        ) : (
+          <Button
+            onClick={handleNext}
+            disabled={!canProceed() || isPending}
+            className="w-full h-12 text-base font-medium dark:text-white mb-4"
+            type="button"
+          >
+            Continuar
+          </Button>
+        )}
       </div>
     </form>
   );
