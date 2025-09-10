@@ -1,4 +1,10 @@
+export interface IImagem {
+  url_imagem: string;
+}
+
+
 export default interface IAnuncio {
+  id: number;
   usuario_id: number;
   categoria_id: number;
   titulo: string;
@@ -8,7 +14,7 @@ export default interface IAnuncio {
   tipo: "TROCA" | "DOACAO";
   condicao: "NOVO" | "SEMINOVO" | "USADO";
   status: "DISPONIVEL" | "NEGOCIANDO" | "FINALIZADO";
-  imagens?: string[] | null;
+  imagens?: (string | IImagem)[];
 }
 
 export interface IAnuncioResponse {

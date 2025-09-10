@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { ModeToggle } from "@/components/ui/mode-toggle";
 import { MessageSquareText, Search, SlidersHorizontal } from "lucide-react";
 import { cookies } from "next/headers";
+import ListagemAnuncios from "@/components/Anuncios/listagem-anuncios";
 
 export default async function TelaInicial() {
   const cookieStore = await cookies();
@@ -33,6 +34,9 @@ export default async function TelaInicial() {
           <SlidersHorizontal className="!size-5" />
         </Button>
       </section>
+
+      <ListagemAnuncios />
+      
       <div className="mt-auto flex justify-center">
         <ButtonNav />
       </div>
