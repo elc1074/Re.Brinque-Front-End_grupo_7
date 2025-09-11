@@ -133,7 +133,6 @@ export default function ListagemAnuncios() {
             style={{ textDecoration: "none", color: "inherit" }}
           >
             <Card>
-              <p>{anuncio.id}</p>
               <div className="aspect-square relative overflow-hidden rounded-t-lg bg-muted">
                 {anuncio.imagens && anuncio.imagens.length > 0 ? (
                   <>

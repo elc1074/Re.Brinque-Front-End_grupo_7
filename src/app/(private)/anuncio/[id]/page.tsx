@@ -34,7 +34,7 @@ export default function AnuncioPage() {
         </div>
       </header>
 
-      <div className="p-4">
+      <div className="p-4 max-w-md mx-auto w-full">
         <Card>
           <div className="aspect-square relative overflow-hidden rounded-t-lg bg-muted">
             {anuncio.imagens?.length ? (
