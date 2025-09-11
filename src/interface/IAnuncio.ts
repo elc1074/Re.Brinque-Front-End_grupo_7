@@ -4,7 +4,7 @@ export interface IImagem {
 
 
 export default interface IAnuncio {
-  id: number;
+  id?: number;
   usuario_id: number;
   categoria_id: number;
   titulo: string;
