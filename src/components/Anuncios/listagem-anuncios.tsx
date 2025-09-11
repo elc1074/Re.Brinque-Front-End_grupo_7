@@ -3,14 +3,14 @@
 import { useAnuncioMutation } from "@/hooks/useAnuncio";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { ChevronLeft, ChevronRight, MapPin } from "lucide-react";
+import { ChevronLeft, ChevronRight, Loader2, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useRef } from "react";
-import Image from "next/image";
 import IAnuncio from "@/interface/IAnuncio";
+import Link from "next/link";
 
 export default function ListagemAnuncios() {
-  const { anuncios, isLoadingAnuncios, isErrorAnuncios } = useAnuncioMutation();
+  const { anuncios, isPendingAnuncios, isErrorAnuncios } = useAnuncioMutation();
   const scrollRef = useRef<HTMLDivElement>(null);
 
   // Garante que lista sempre será um array de anúncios
@@ -32,21 +32,7 @@ export default function ListagemAnuncios() {
     }
   };
 
-  if (isErrorAnuncios || lista.length === 0) {
-    return (
-      <div className="px-6 mt-6">
-        <h2 className="text-xl font-semibold mb-4 text-foreground">
-          Anúncios Recentes
-        </h2>
-        <div className="text-center py-8 text-muted-foreground">
-          {isErrorAnuncios
-            ? "Erro ao carregar anúncios"
-            : "Nenhum anúncio encontrado"}
-        </div>
-      </div>
-    );
-  }
-
+  
   const getCondicaoColor = (condicao: string) => {
     switch (condicao) {
       case "NOVO":
@@ -55,22 +41,23 @@ export default function ListagemAnuncios() {
         return "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200";
       case "USADO":
         return "bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200";
-      default:
-        return "bg-muted text-muted-foreground";
+        default:
+          return "bg-muted text-muted-foreground";
     }
   };
 
   const getTipoColor = (tipo: string) => {
     return tipo === "DOACAO"
-      ? "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200"
+    ? "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200"
       : "bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200";
   };
 
-  if (isLoadingAnuncios) {
+  if (isPendingAnuncios) {
     return (
       <div className="px-6 mt-6">
-        <h2 className="text-xl font-semibold mb-4 text-foreground">
-          Anúncios Recentes
+        <h2 className="text-xl font-semibold mb-4 text-foreground items-center">
+          <Loader2 className="animate-spin mr-2 inline-block text-primary" />
+          Carregando Anúncios Recentes
         </h2>
         <div className="flex gap-4 overflow-hidden">
           {[...Array(3)].map((_, i) => (
@@ -91,8 +78,21 @@ export default function ListagemAnuncios() {
       </div>
     );
   }
-
-  // Removido: checagem duplicada de erro/anúncios
+  
+  if (isErrorAnuncios || lista.length === 0) {
+    return (
+      <div className="px-6 mt-6">
+        <h2 className="text-xl font-semibold mb-4 text-foreground">
+          Anúncios Recentes
+        </h2>
+        <div className="text-center py-8 text-muted-foreground">
+          {isErrorAnuncios
+            ? "Erro ao carregar anúncios"
+            : "Nenhum anúncio encontrado"}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="px-6 mt-6">
@@ -126,48 +126,53 @@ export default function ListagemAnuncios() {
         style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
       >
         {lista.map((anuncio) => (
-          <Card
+          <Link
             key={`${anuncio.id}`}
-            className="min-w-[260px] hover:shadow-lg transition-shadow cursor-pointer"
+            href={`/anuncio/${anuncio.id}`}
+            className="min-w-[250px] hover:shadow-lg transition-shadow cursor-pointer block"
+            style={{ textDecoration: "none", color: "inherit" }}
           >
-            <div className="aspect-square relative overflow-hidden rounded-t-lg bg-muted">
-              {anuncio.imagens && anuncio.imagens.length > 0 ? (
-                <>
-                <p>Imagem não implementada</p>
-                </>
-              ) : (
-                <div className="flex items-center justify-center h-full text-muted-foreground">
-                  <span className="text-sm">Sem imagem</span>
-                </div>
-              )}
-            </div>
-            <CardContent className="p-4">
-              <h3 className="font-semibold text-foreground mb-1 line-clamp-2 leading-tight">
-                {anuncio.titulo}
-              </h3>
-              {anuncio.marca && (
-                <p className="text-sm text-muted-foreground mb-2">
-                  {anuncio.marca}
-                </p>
-              )}
-              <div className="flex gap-2 mb-3 flex-wrap">
-                <Badge className={getCondicaoColor(anuncio.condicao)}>
-                  {anuncio.condicao}
-                </Badge>
-                <Badge className={getTipoColor(anuncio.tipo)}>
-                  {anuncio.tipo}
-                </Badge>
+            <Card>
+              <p>{anuncio.id}</p>
+              <div className="aspect-square relative overflow-hidden rounded-t-lg bg-muted">
+                {anuncio.imagens && anuncio.imagens.length > 0 ? (
+                  <>
+                    <p>Imagem não implementada</p>
+                  </>
+                ) : (
+                  <div className="flex items-center justify-center h-full text-muted-foreground">
+                    <span className="text-sm">Sem imagem</span>
+                  </div>
+                )}
               </div>
-              {anuncio.endereco_completo && (
-                <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                  <MapPin className="h-3 w-3" />
-                  <span className="truncate">
-                    {anuncio.endereco_completo}
-                  </span>
+              <CardContent className="p-4">
+                <h3 className="font-semibold text-foreground mb-1 line-clamp-2 leading-tight">
+                  {anuncio.titulo}
+                </h3>
+                {anuncio.marca && (
+                  <p className="text-sm text-muted-foreground mb-2">
+                    {anuncio.marca}
+                  </p>
+                )}
+                <div className="flex gap-2 mb-3 flex-wrap">
+                  <Badge className={getCondicaoColor(anuncio.condicao)}>
+                    {anuncio.condicao}
+                  </Badge>
+                  <Badge className={getTipoColor(anuncio.tipo)}>
+                    {anuncio.tipo}
+                  </Badge>
                 </div>
-              )}
-            </CardContent>
-          </Card>
+                {anuncio.endereco_completo && (
+                  <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                    <MapPin className="h-3 w-3" />
+                    <span className="truncate">
+                      {anuncio.endereco_completo}
+                    </span>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </Link>
         ))}
       </div>
     </div>

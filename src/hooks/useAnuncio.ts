@@ -1,14 +1,17 @@
+
+"use client";
 import IAnuncio, { IAnuncioResponse } from "@/interface/IAnuncio";
-import { useMutation, useQuery } from "@tanstack/react-query"
+import { useMutation, useQuery } from "@tanstack/react-query";
 
 const URL_API = process.env.NEXT_PUBLIC_API_URL;
 
+// Função para criar anúncio
 async function criarAnuncioRequest(data: IAnuncio): Promise<IAnuncioResponse> {
   try {
-const token =
-  typeof document !== "undefined"
-    ? document.cookie.match(/token=([^;]+)/)?.[1]
-    : undefined;
+    const token =
+      typeof document !== "undefined"
+        ? document.cookie.match(/token=([^;]+)/)?.[1]
+        : undefined;
 
     const headers: Record<string, string> = {
       "Content-Type": "application/json",
@@ -32,7 +35,7 @@ const token =
   }
 }
 
-// Função para buscar anúncios
+// Função para buscar todos anúncios
 async function getAnunciosRequest(): Promise<IAnuncio[]> {
   const response = await fetch(`${URL_API}/api/anuncios`);
   if (response.ok) {
@@ -43,13 +46,25 @@ async function getAnunciosRequest(): Promise<IAnuncio[]> {
   }
 }
 
+// Função para buscar anúncio por id
+async function getAnuncioByIdRequest(id: string): Promise<IAnuncio> {
+  const response = await fetch(`${URL_API}/api/anuncios/${id}`);
+  if (response.ok) {
+    return await response.json();
+  } else {
+    const error = await response.text();
+    throw new Error(error);
+  }
+}
+
+// Hook para criar e listar anúncios
 export function useAnuncioMutation() {
   const mutation = useMutation<IAnuncioResponse, Error, IAnuncio>({
     mutationFn: criarAnuncioRequest,
   });
 
   // Hook para buscar anúncios
-  const { data: anuncios, isLoading, isError, error } = useQuery<IAnuncio[], Error>({
+  const { data: anuncios, isPending, isError, error } = useQuery<IAnuncio[], Error>({
     queryKey: ["anuncios"],
     queryFn: getAnunciosRequest,
   });
@@ -62,8 +77,24 @@ export function useAnuncioMutation() {
     error: mutation.error,
     data: mutation.data,
     anuncios,
-    isLoadingAnuncios: isLoading,
+    isPendingAnuncios: isPending,
     isErrorAnuncios: isError,
     errorAnuncios: error,
+  };
+}
+
+// Hook para buscar anúncio por id
+export function useAnuncioById(id: string) {
+  const { data, isPending, isError, error } = useQuery<IAnuncio, Error>({
+    queryKey: ["anuncio", id],
+    queryFn: () => getAnuncioByIdRequest(id),
+    enabled: !!id,
+  });
+
+  return {
+    anuncio: data,
+    isPending,
+    isError,
+    error,
   };
 }

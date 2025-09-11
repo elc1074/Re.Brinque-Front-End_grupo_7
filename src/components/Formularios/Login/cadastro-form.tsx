@@ -141,7 +141,7 @@ export default function CadastroForm() {
       </div>
       <Button
         type="submit"
-        className="h-12 text-base font-medium fixed bottom-4 left-1/2 transform -translate-x-1/2 max-w-sm w-full px-4"
+        className="text-white h-12 text-base font-medium fixed bottom-4 left-1/2 transform -translate-x-1/2 max-w-sm w-full px-4"
         disabled={isPending}
         aria-busy={isPending}
       >
