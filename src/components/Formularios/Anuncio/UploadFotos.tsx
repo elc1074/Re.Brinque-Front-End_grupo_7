@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 type Props = {
   cloudName: string;
   apiKey: string;
+  uploadPreset: string;
   value: string[];
   onChange: (urls: string[]) => void;
   max?: number; // ex.: 6
@@ -17,6 +18,7 @@ type Props = {
 export default function UploadFotos({
   cloudName,
   apiKey,
+  uploadPreset,
   value,
   onChange,
   max = 6,
@@ -47,7 +49,8 @@ export default function UploadFotos({
 
         const formData = new FormData();
         formData.append("file", file);
-        formData.append('apiKey', apiKey);
+        formData.append("upload_preset", uploadPreset);
+        formData.append("api_key", apiKey);
 
         const res = await fetch(
           `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`,

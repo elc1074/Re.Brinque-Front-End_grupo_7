@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 type CloudinaryConfig = {
   cloudName: string;
   apiKey: string;
-  uploadPreset: string; // se você optou por retornar isso do back
+  uploadPreset: string;
 };
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;

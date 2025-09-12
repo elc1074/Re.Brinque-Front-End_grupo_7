@@ -123,6 +123,7 @@ export default function CriarAnuncioForm({ usuario_id }: { usuario_id: number })
               <UploadFotos
                 cloudName={config.cloudName}
                 value={formData.imagens}
+                uploadPreset={config.uploadPreset}
                 apiKey={config.apiKey}
                 onChange={(urls) =>
                   setValue("imagens", urls, { shouldValidate: true })
