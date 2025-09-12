@@ -29,7 +29,8 @@ export const criarAnuncioSchema = z.object({
   status: z.enum(["DISPONIVEL", "NEGOCIANDO", "FINALIZADO"], {
     message: "Selecione o status",
   }),
-  
+
+  imagens: z.array(z.string().url()).min(1, "Envie pelo menos 1 foto"), // <- novo
 });
 
 export type CriarAnuncioSchemaType = z.infer<typeof criarAnuncioSchema>;

@@ -17,6 +17,8 @@ import {
 } from "@/schema/criar-anuncio-schema";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import UploadFotos from "./UploadFotos";
+import { useCloudinaryConfig } from "@/hooks/useCloudinaryConfig";
 
 const categorias = [
   { id: 1, nome: "Artísticos", icon: "🎨" },
@@ -40,6 +42,11 @@ type CriarAnuncioSchemaType = z.infer<typeof criarAnuncioSchema>;
 export default function CriarAnuncioForm({ usuario_id }: { usuario_id: number }) {
   const [step, setStep] = useState(1);
   const router = useRouter();
+  const {
+    config,
+    loading: loadingCloud,
+    error: cloudErr,
+  } = useCloudinaryConfig();
 
   const {
     register,
@@ -56,9 +63,11 @@ export default function CriarAnuncioForm({ usuario_id }: { usuario_id: number })
       condicao: undefined,
       descricao: "",
       status: "DISPONIVEL",
+      imagens: [],
     },
   });
   const formData = watch();
+  
 
   const handleNext = () => {
     if (step < 6) setStep(step + 1);
@@ -83,9 +92,11 @@ export default function CriarAnuncioForm({ usuario_id }: { usuario_id: number })
     };
     try {
       const result = await criarAnuncio(payload);
+      if (result?.error) {
+        return toast.error(result.error);
+      }
         toast.success("Anúncio criado com sucesso!");
         router.push("/tela-inicial");
-      if (result?.error) toast.error(result.error);
     } catch (e: any) {
       console.error("Erro ao criar anúncio:", e);
       toast.error(e.message);
@@ -95,6 +106,43 @@ export default function CriarAnuncioForm({ usuario_id }: { usuario_id: number })
   const renderStep = () => {
     switch (step) {
       case 1:
+        return (
+          <div className="space-y-2">
+            <Label className="text-lg font-medium">Fotos do produto</Label>
+            {cloudErr && (
+              <span className="text-red-500 text-sm">
+                Erro ao carregar config do Cloudinary: {cloudErr}
+              </span>
+            )}
+
+            {loadingCloud ? (
+              <div className="text-sm text-muted-foreground">
+                Carregando configurações…
+              </div>
+            ) : config ? (
+              <UploadFotos
+                cloudName={config.cloudName}
+                value={formData.imagens}
+                apiKey={config.apiKey}
+                onChange={(urls) =>
+                  setValue("imagens", urls, { shouldValidate: true })
+                }
+                max={6}
+              />
+            ) : (
+              <div className="text-sm text-red-500">
+                Não foi possível obter as configurações do Cloudinary.
+              </div>
+            )}
+
+            {errors.imagens && (
+              <span className="text-red-500 text-sm">
+                {errors.imagens.message as string}
+              </span>
+            )}
+          </div>
+        );
+      case 2:
         return (
           <div className="space-y-6">
             <div className="space-y-4">
@@ -116,7 +164,7 @@ export default function CriarAnuncioForm({ usuario_id }: { usuario_id: number })
             </div>
           </div>
         );
-      case 2:
+      case 3:
         return (
           <div className="space-y-6">
             <Label className="text-lg font-medium">Descreva seu produto</Label>
@@ -138,7 +186,7 @@ export default function CriarAnuncioForm({ usuario_id }: { usuario_id: number })
             </div>
           </div>
         );
-      case 3:
+      case 4:
         return (
           <div className="space-y-6">
             <Label className="text-lg font-medium">
@@ -173,7 +221,7 @@ export default function CriarAnuncioForm({ usuario_id }: { usuario_id: number })
             )}
           </div>
         );
-      case 4:
+      case 5:
         return (
           <div className="space-y-6">
             <Label className="text-lg font-medium">
@@ -209,7 +257,7 @@ export default function CriarAnuncioForm({ usuario_id }: { usuario_id: number })
             )}
           </div>
         );
-      case 5:
+      case 6:
         return (
           <div className="space-y-6">
             <Label className="text-lg font-medium">
@@ -235,7 +283,7 @@ export default function CriarAnuncioForm({ usuario_id }: { usuario_id: number })
             )}
           </div>
         );
-      case 6:
+      case 7:
         return (
           <div className="space-y-6">
             <Label className="text-lg font-medium">
@@ -277,17 +325,17 @@ export default function CriarAnuncioForm({ usuario_id }: { usuario_id: number })
 
   const canProceed = () => {
     switch (step) {
-      case 1:
-        return formData.titulo.trim().length > 0;
       case 2:
-        return formData.descricao.trim().length > 0;
+        return formData.titulo.trim().length > 0;
       case 3:
-        return formData.condicao !== undefined;
+        return formData.descricao.trim().length > 0;
       case 4:
-        return formData.categoria_id !== null;
+        return formData.condicao !== undefined;
       case 5:
-        return true;
+        return formData.categoria_id !== null;
       case 6:
+        return true;
+      case 7:
         return formData.tipo === "TROCA" || formData.tipo === "DOACAO";
       default:
         return formData.tipo === "TROCA" || formData.tipo === "DOACAO";
@@ -323,7 +371,7 @@ export default function CriarAnuncioForm({ usuario_id }: { usuario_id: number })
         <div className="w-full bg-gray-200 rounded-full h-1">
           <div
             className="bg-green-600 h-1 rounded-full transition-all duration-300"
-            style={{ width: `${(step / 6) * 100}%` }}
+            style={{ width: `${(step / 7) * 100}%` }}
           />
         </div>
       </div>
@@ -333,7 +381,7 @@ export default function CriarAnuncioForm({ usuario_id }: { usuario_id: number })
 
       {/* Footer */}
       <div className="p-6">
-        {step === 6 ? (
+        {step === 7 ? (
           <Button
             disabled={!canProceed() || isPending}
             className="w-full h-12 text-base font-medium dark:text-white mb-4"
