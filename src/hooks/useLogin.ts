@@ -12,8 +12,17 @@ async function loginRequest(data: ILogin): Promise<any> {
 			},
 			body: JSON.stringify(data),
 		});
+		
 		if (response.ok) {
-			return await response.json();
+			const responseData = await response.json();
+			
+			if (responseData.usuario && responseData.token) {
+				sessionStorage.setItem('user', JSON.stringify(responseData.usuario));
+				sessionStorage.setItem('token', responseData.token);
+				sessionStorage.setItem('auth_type', responseData.auth_type || 'normal');
+			}
+			
+			return responseData;
 		} else {
 			const error = await response.text();
 			return { error };

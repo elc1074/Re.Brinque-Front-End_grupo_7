@@ -34,9 +34,15 @@ export default function LoginForm() {
   async function onSubmit(values: LoginFormValues) {
     try {
       const data = await login(values);
+      
+      if (data?.error) {
+        toast.error(data.error);
+        return;
+      }
+
       if (data?.message) {
         toast.success(data.message);
-        // Salvar dados nos cookies
+  
         const cookieResponse = await fetch("/api/set-cookie", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -45,14 +51,16 @@ export default function LoginForm() {
             id: data.usuario?.id,
             nome: data.usuario?.nome,
             email: data.usuario?.email,
+            auth_type: data.auth_type 
           }),
         });
+        
         if (!cookieResponse.ok) {
           throw new Error("Erro ao definir o cookie");
         }
+        
         router.push("/tela-inicial");
       }
-      if (data?.error) toast.error(data.error);
     } catch (e: any) {
       toast.error(e?.message ?? "Erro ao fazer login.");
     }

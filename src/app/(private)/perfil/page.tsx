@@ -86,9 +86,19 @@ export default function PerfilPage() {
 
   const handleLogout = async () => {
     try {
+      // 1. Chamar API de logout para limpar o cookie no backend
       await fetch("/api/logout", { method: "POST" });
-    } catch {}
-    router.push("/login");
+    } catch (error) {
+      console.error("Erro na API de logout:", error);
+    } finally {
+      // 2. Limpar sessionStorage (frontend)
+      sessionStorage.removeItem('user');
+      sessionStorage.removeItem('token');
+      sessionStorage.removeItem('auth_type');
+      
+      // 3. Redirecionar para login com reload completo
+      window.location.href = '/login';
+    }
   };
 
   return (

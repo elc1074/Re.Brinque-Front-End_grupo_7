@@ -1,11 +1,11 @@
 "use client";
 
-// import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/ui/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import GoogleSyncHandler from "@/components/GoogleSyncHandler";
 
 const queryClient = new QueryClient();
 
@@ -19,34 +19,27 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-// export const metadata: Metadata = {
-//   title: "Re.Brinque",
-//   description: "Aplicativo de troca de brinquedos",
-//   themeColor: "#316A41",
-// };
-
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   return (
-    <QueryClientProvider client={queryClient}>
-      <html lang="pt-BR" suppressHydrationWarning>
-        <body
-          className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-        >
+    <html lang="pt-BR" suppressHydrationWarning>
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+        <QueryClientProvider client={queryClient}>
           <ThemeProvider
             attribute="class"
             defaultTheme="system"
             enableSystem
             disableTransitionOnChange
           >
+            <GoogleSyncHandler />
             {children}
             <Toaster richColors position="top-center" />
           </ThemeProvider>
-        </body>
-      </html>
-    </QueryClientProvider>
+        </QueryClientProvider>
+      </body>
+    </html>
   );
 }

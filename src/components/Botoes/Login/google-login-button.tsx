@@ -1,19 +1,22 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { createAuthClient } from "better-auth/client";
 
 export default function GoogleLoginButton() {
-  const authClient = createAuthClient({
-    basePath: "/api/auth",
-  });
+  const handleGoogleLogin = () => {
+    const redirectURI = "https://front-re-brinque.vercel.app";
+    
+    const googleAuthUrl = new URL('https://accounts.google.com/o/oauth2/v2/auth');
+    googleAuthUrl.searchParams.append('client_id', '634300399694-ht7h5q80m2kndot2204p4eba47v44plm.apps.googleusercontent.com');
+    googleAuthUrl.searchParams.append('redirect_uri', redirectURI);
+    googleAuthUrl.searchParams.append('response_type', 'code');
+    googleAuthUrl.searchParams.append('scope', 'email profile openid');
+    googleAuthUrl.searchParams.append('access_type', 'offline');
+    googleAuthUrl.searchParams.append('prompt', 'consent');
 
-  const handleGoogleLogin = async () => {
-    await authClient.signIn.social({
-      provider: "google",
-      callbackURL: "https://front-re-brinque.vercel.app",
-    });
+    window.location.href = googleAuthUrl.toString();
   };
+
   return (
     <div>
       <Button
@@ -28,7 +31,6 @@ export default function GoogleLoginButton() {
             fill="currentColor"
           />
         </svg>
-        <span className="sr-only">Login with Google</span>
         Entrar com Google
       </Button>
     </div>
