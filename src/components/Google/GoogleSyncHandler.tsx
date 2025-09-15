@@ -35,12 +35,27 @@ export default function GoogleSyncHandler() {
             if (syncResponse.ok) {
               const data = await syncResponse.json();
               
+              try {
+                const cookieResponse = await fetch("/api/set-cookie", {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({
+                    token: data.token,
+                    id: data.usuario?.id,
+                    nome: data.usuario?.nome,
+                    email: data.usuario?.email,
+                  }),
+                });
+                if (!cookieResponse.ok) {
+                  throw new Error("Erro ao definir o cookie");
+                }
+              } catch (e) {
+                alert("Erro ao definir o cookie de autenticação.");
+              }
+
               sessionStorage.setItem('user', JSON.stringify(data.usuario));
               sessionStorage.setItem('auth_type', 'google');
-              
-              window.history.replaceState({}, '', '/');
-              window.location.href = '/tela-inicial';
-              
+              router.push('/tela-inicial');
             } else {
               const errorText = await syncResponse.text();              
               alert('Erro no servidor: ' + errorText);

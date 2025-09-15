@@ -5,7 +5,7 @@ import "./globals.css";
 import { ThemeProvider } from "@/components/ui/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import GoogleSyncHandler from "@/components/GoogleSyncHandler";
+import GoogleSyncHandler from "@/components/Google/GoogleSyncHandler";
 
 const queryClient = new QueryClient();
 
