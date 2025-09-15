@@ -4,5 +4,5 @@ export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const code = searchParams.get('code');
   
-  return NextResponse.redirect('http://localhost:3000/');
+  return NextResponse.redirect('https://front-re-brinque.vercel.app/');
 }
