@@ -5,7 +5,7 @@ const URL_API = process.env.NEXT_PUBLIC_API_URL;
 
 async function loginRequest(data: ILogin): Promise<any> {
 	try {
-		const response = await fetch(`${URL_API}/api/auth/login`, {
+		const response = await fetch(`${URL_API}api/auth/login`, {
 			method: "POST",
 			headers: {
 				"Content-Type": "application/json",
