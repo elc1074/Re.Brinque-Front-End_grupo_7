@@ -28,7 +28,7 @@ export default function GoogleSyncHandler() {
               credentials: 'include',
               body: JSON.stringify({
                 code: code,
-                redirect_uri: 'https://front-re-brinque.vercel.app'
+                redirect_uri: 'https://front-re-brinque.vercel.app/google-calback'
               }),
             });
     
