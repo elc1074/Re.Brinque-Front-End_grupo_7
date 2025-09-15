@@ -13,7 +13,6 @@ export default function GoogleSyncHandler() {
         const searchParams = new URLSearchParams(window.location.search);
         const code = searchParams.get('code');
         const error = searchParams.get('error');
-        const redirect = searchParams.get('redirect') || '/tela-inicial';
         
         if (error) {
           alert(`Falha no login Google: ${error}. Tente novamente.`);
@@ -40,7 +39,7 @@ export default function GoogleSyncHandler() {
               sessionStorage.setItem('auth_type', 'google');
               
               window.history.replaceState({}, '', '/');
-              window.location.href = redirect;
+              window.location.href = '/tela-inicial';
               
             } else {
               const errorText = await syncResponse.text();              
