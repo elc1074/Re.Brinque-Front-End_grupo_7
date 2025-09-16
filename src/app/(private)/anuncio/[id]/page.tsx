@@ -53,7 +53,7 @@ export default function AnuncioPage() {
         </div>
       </header>
 
-      <div className="p-4 max-w-sm mx-auto w-full">
+      <div className="p-4 max-w-sm mx-auto w-full pb-44">
         <div className="aspect-square overflow-hidden rounded-lg bg-muted">
           {anuncio.imagens && anuncio.imagens.length > 0 ? (
             (() => {
