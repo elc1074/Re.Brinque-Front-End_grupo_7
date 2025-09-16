@@ -30,7 +30,12 @@ export const criarAnuncioSchema = z.object({
     message: "Selecione o status",
   }),
 
-  imagens: z.array(z.string().url()).min(1, "Envie pelo menos 1 foto"), // <- novo
+  imagens: z.array(
+    z.object({
+      url_imagem: z.string().url("URL inválida"),
+      principal: z.boolean(),
+    })
+  ).min(1, "Envie pelo menos 1 foto"),
 });
 
 export type CriarAnuncioSchemaType = z.infer<typeof criarAnuncioSchema>;

@@ -33,10 +33,6 @@ export default function UploadFotos({
     setIsUploading(true);
 
     try {
-      const token =
-        typeof document !== "undefined"
-          ? document.cookie.match(/token=([^;]+)/)?.[1]
-          : undefined;
       const uploaded: string[] = [];
       for (const file of filesArr) {
         // validações simples
@@ -57,7 +53,6 @@ export default function UploadFotos({
           {
             method: "POST",
             body: formData,
-            //headers: { Authorization: `Bearer ${token}` },
           }
         );
 

@@ -43,7 +43,7 @@ export default function TelaInicial() {
     <main className="min-h-dvh bg-background flex flex-col pt-6">
       <header className="flex justify-between px-6">
         <h1 className="text-2xl font-semibold text-zinc-900 dark:text-primary">
-          Olá, {user.nome || user.email} {/* ✅ Agora pega do sessionStorage */}
+          Olá, {user.nome || user.email}
         </h1>
         <div className="flex items-center gap-4">
           <ModeToggle className="text-primary" />

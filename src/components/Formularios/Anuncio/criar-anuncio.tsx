@@ -47,7 +47,7 @@ export default function CriarAnuncioForm({ usuario_id }: { usuario_id: number })
     loading: loadingCloud,
     error: cloudErr,
   } = useCloudinaryConfig();
-
+  
   const {
     register,
     handleSubmit,
@@ -67,10 +67,9 @@ export default function CriarAnuncioForm({ usuario_id }: { usuario_id: number })
     },
   });
   const formData = watch();
-  
 
   const handleNext = () => {
-    if (step < 6) setStep(step + 1);
+    if (step < 7) setStep(step + 1);
   };
 
   const handleBack = () => {
@@ -102,7 +101,7 @@ export default function CriarAnuncioForm({ usuario_id }: { usuario_id: number })
       toast.error(e.message);
     }
   }
-
+  
   const renderStep = () => {
     switch (step) {
       case 1:
@@ -122,12 +121,17 @@ export default function CriarAnuncioForm({ usuario_id }: { usuario_id: number })
             ) : config ? (
               <UploadFotos
                 cloudName={config.cloudName}
-                value={formData.imagens}
+                value={formData.imagens.map((img) => img.url_imagem)}
                 uploadPreset={config.uploadPreset}
                 apiKey={config.apiKey}
-                onChange={(urls) =>
-                  setValue("imagens", urls, { shouldValidate: true })
-                }
+                onChange={(urls) => {
+                  // Transforma para o formato [{ url_imagem, principal }]
+                  const imagens = urls.map((url, idx) => ({
+                    url_imagem: url,
+                    principal: idx === 0,
+                  }));
+                  setValue("imagens", imagens, { shouldValidate: true });
+                }}
                 max={6}
               />
             ) : (
@@ -273,7 +277,7 @@ export default function CriarAnuncioForm({ usuario_id }: { usuario_id: number })
               variant="ghost"
               className="w-full text-gray-600"
               type="button"
-              onClick={() => setValue("marca", null, { shouldValidate: true })}
+              onClick={() => setValue("marca", null)}
             >
               Sem marca
             </Button>
@@ -326,6 +330,8 @@ export default function CriarAnuncioForm({ usuario_id }: { usuario_id: number })
 
   const canProceed = () => {
     switch (step) {
+      case 1:
+        return formData.imagens.length > 0;
       case 2:
         return formData.titulo.trim().length > 0;
       case 3:

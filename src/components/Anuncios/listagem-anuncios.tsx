@@ -135,9 +135,29 @@ export default function ListagemAnuncios() {
             <Card>
               <div className="aspect-square relative overflow-hidden rounded-t-lg bg-muted">
                 {anuncio.imagens && anuncio.imagens.length > 0 ? (
-                  <>
-                    <p>Imagem não implementada</p>
-                  </>
+                  (() => {
+                    const principal = Array.isArray(anuncio.imagens)
+                      ? (anuncio.imagens.find(
+                          (img: any) =>
+                            typeof img === "object" &&
+                            img !== null &&
+                            "url_imagem" in img &&
+                            img.principal
+                        ) as { url_imagem: string; principal: boolean } | undefined)
+                      : undefined;
+                    return principal ? (
+                      <img
+                        src={principal.url_imagem}
+                        alt={anuncio.titulo}
+                        className="object-cover w-full h-full"
+                        style={{ aspectRatio: 1 }}
+                      />
+                    ) : (
+                      <div className="flex items-center justify-center h-full text-muted-foreground">
+                        <span className="text-sm">Sem imagem principal</span>
+                      </div>
+                    );
+                  })()
                 ) : (
                   <div className="flex items-center justify-center h-full text-muted-foreground">
                     <span className="text-sm">Sem imagem</span>
