@@ -37,9 +37,9 @@ export default function UploadFotos({
       for (const file of filesArr) {
         // validações simples
         if (!file.type.startsWith("image/")) continue;
-        if (file.size > 5 * 1024 * 1024) {
+        if (file.size > 30 * 10000 * 10000) {
           // 5MB (ajuste como quiser)
-          console.warn(`${file.name} > 5MB, ignorado`);
+          console.warn(`${file.name} > 30MB, ignorado`);
           continue;
         }
 
