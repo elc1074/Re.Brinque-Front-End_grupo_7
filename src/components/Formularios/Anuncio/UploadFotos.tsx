@@ -5,6 +5,7 @@ import { useState, useRef } from "react";
 import Image from "next/image";
 import { X, Loader2, Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 
 type Props = {
   cloudName: string;
@@ -37,9 +38,9 @@ export default function UploadFotos({
       for (const file of filesArr) {
         // validações simples
         if (!file.type.startsWith("image/")) continue;
-        if (file.size > 30 * 10000 * 10000) {
-          // 5MB (ajuste como quiser)
-          console.warn(`${file.name} > 30MB, ignorado`);
+        if (file.size > 30 * 1024 * 1024) {
+          // 30MB
+          toast.error(`${file.name} arquivo muito grande! Tente outro.`);
           continue;
         }
 
@@ -57,7 +58,7 @@ export default function UploadFotos({
         );
 
         if (!res.ok) {
-          console.error("Falha no upload:", await res.text());
+          toast.error("Falha no upload: " + (await res.text()));
           continue;
         }
         const data = await res.json();
