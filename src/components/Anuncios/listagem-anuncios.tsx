@@ -8,31 +8,20 @@ import { Button } from "@/components/ui/button";
 import { useRef } from "react";
 import IAnuncio from "@/interface/IAnuncio";
 import Link from "next/link";
+import Image from "next/image";
+import { ScrollArea } from "../ui/scroll-area";
 
 export default function ListagemAnuncios() {
   const { anuncios, isPendingAnuncios, isErrorAnuncios } = useAnuncioMutation();
-  const scrollRef = useRef<HTMLDivElement>(null);
 
   // Garante que lista sempre será um array de anúncios
-  const lista: IAnuncio[] = anuncios && typeof anuncios === "object" && "anuncios" in anuncios
-    ? (anuncios as { anuncios: IAnuncio[] }).anuncios
-    : Array.isArray(anuncios)
-      ? anuncios as IAnuncio[]
+  const lista: IAnuncio[] =
+    anuncios && typeof anuncios === "object" && "anuncios" in anuncios
+      ? (anuncios as { anuncios: IAnuncio[] }).anuncios
+      : Array.isArray(anuncios)
+      ? (anuncios as IAnuncio[])
       : [];
 
-  const scrollLeft = () => {
-    if (scrollRef.current) {
-      scrollRef.current.scrollBy({ left: -280, behavior: "smooth" });
-    }
-  };
-
-  const scrollRight = () => {
-    if (scrollRef.current) {
-      scrollRef.current.scrollBy({ left: 280, behavior: "smooth" });
-    }
-  };
-
-  
   const getCondicaoColor = (condicao: string) => {
     switch (condicao) {
       case "NOVO":
@@ -41,15 +30,15 @@ export default function ListagemAnuncios() {
         return "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200";
       case "USADO":
         return "bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200";
-        default:
-          return "bg-muted text-muted-foreground";
+      default:
+        return "bg-muted text-muted-foreground";
     }
   };
 
   const getTipoColor = (tipo: string) => {
     return tipo === "DOACAO"
-    ? "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200"
-      : "bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200";
+      ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200 border-green-500 dark:border-green-300"
+      : "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 border-blue-500 dark:border-blue-300";
   };
 
   if (isPendingAnuncios) {
@@ -59,9 +48,9 @@ export default function ListagemAnuncios() {
           <Loader2 className="animate-spin mr-2 inline-block text-primary" />
           Carregando Anúncios Recentes
         </h2>
-        <div className="flex gap-4 overflow-hidden">
-          {[...Array(3)].map((_, i) => (
-            <Card key={i} className="min-w-[260px] animate-pulse">
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+          {[...Array(4)].map((_, i) => (
+            <Card key={i} className="animate-pulse">
               <div className="aspect-square bg-muted rounded-t-lg" />
               <CardContent className="p-4">
                 <div className="h-4 bg-muted rounded mb-2" />
@@ -78,7 +67,7 @@ export default function ListagemAnuncios() {
       </div>
     );
   }
-  
+
   if (isErrorAnuncios || lista.length === 0) {
     return (
       <div className="px-6 mt-6">
@@ -96,44 +85,19 @@ export default function ListagemAnuncios() {
 
   return (
     <div className="px-6 mt-6">
-      <div className="flex items-center justify-between mb-4">
-        <h2 className="text-xl font-semibold text-foreground">
-          Anúncios Recentes
-        </h2>
-        <div className="flex gap-2">
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={scrollLeft}
-            className="h-8 w-8 bg-transparent"
-          >
-            <ChevronLeft className="h-4 w-4" />
-          </Button>
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={scrollRight}
-            className="h-8 w-8 bg-transparent"
-          >
-            <ChevronRight className="h-4 w-4" />
-          </Button>
-        </div>
-      </div>
-
-      <div
-        ref={scrollRef}
-        className="flex gap-4 overflow-x-auto scrollbar-hide pb-4"
-        style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
-      >
-        {lista.map((anuncio) => (
-          <Link
-            key={`${anuncio.id}`}
-            href={`/anuncio/${anuncio.id}`}
-            className="min-w-[250px] hover:shadow-lg transition-shadow cursor-pointer block"
-            style={{ textDecoration: "none", color: "inherit" }}
-          >
-            <Card>
-              <div className="aspect-square relative overflow-hidden rounded-t-lg bg-muted">
+      <h2 className="text-xl font-semibold text-foreground mb-4">
+        Anúncios Recentes
+      </h2>
+      <ScrollArea>
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 max-h-[70vh] overflow-y-auto pb-30 pr-1">
+          {lista.map((anuncio) => (
+            <Link
+              key={`${anuncio.id}`}
+              href={`/anuncio/${anuncio.id}`}
+              className="hover:shadow-lg transition-shadow cursor-pointer block"
+              style={{ textDecoration: "none", color: "inherit" }}
+            >
+              <div className="aspect-square overflow-hidden rounded-lg bg-muted">
                 {anuncio.imagens && anuncio.imagens.length > 0 ? (
                   (() => {
                     const principal = Array.isArray(anuncio.imagens)
@@ -143,14 +107,17 @@ export default function ListagemAnuncios() {
                             img !== null &&
                             "url_imagem" in img &&
                             img.principal
-                        ) as { url_imagem: string; principal: boolean } | undefined)
+                        ) as
+                          | { url_imagem: string; principal: boolean }
+                          | undefined)
                       : undefined;
                     return principal ? (
-                      <img
+                      <Image
                         src={principal.url_imagem}
                         alt={anuncio.titulo}
                         className="object-cover w-full h-full"
-                        style={{ aspectRatio: 1 }}
+                        width={300}
+                        height={300}
                       />
                     ) : (
                       <div className="flex items-center justify-center h-full text-muted-foreground">
@@ -164,36 +131,32 @@ export default function ListagemAnuncios() {
                   </div>
                 )}
               </div>
-              <CardContent className="p-4">
-                <h3 className="font-semibold text-foreground mb-1 line-clamp-2 leading-tight">
-                  {anuncio.titulo}
-                </h3>
+              <div className="space-y-1 mt-2">
+                <Badge className={getTipoColor(anuncio.tipo)}>
+                  {anuncio.tipo}
+                </Badge>
+                <h3 className="text-foreground">{anuncio.titulo}</h3>
                 {anuncio.marca && (
-                  <p className="text-sm text-muted-foreground mb-2">
+                  <p className="text-sm text-muted-foreground">
                     {anuncio.marca}
                   </p>
                 )}
-                <div className="flex gap-2 mb-3 flex-wrap">
-                  <Badge className={getCondicaoColor(anuncio.condicao)}>
-                    {anuncio.condicao}
-                  </Badge>
-                  <Badge className={getTipoColor(anuncio.tipo)}>
-                    {anuncio.tipo}
-                  </Badge>
-                </div>
-                {anuncio.endereco_completo && (
-                  <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                {/* <Badge className={getCondicaoColor(anuncio.condicao)}>
+                      {anuncio.condicao}
+                      </Badge> */}
+                {/* {anuncio.endereco_completo && (
+                    <div className="flex items-center gap-1 text-xs text-muted-foreground">
                     <MapPin className="h-3 w-3" />
                     <span className="truncate">
-                      {anuncio.endereco_completo}
+                    {anuncio.endereco_completo}
                     </span>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          </Link>
-        ))}
-      </div>
+                    </div>
+                    )} */}
+              </div>
+            </Link>
+          ))}
+        </div>
+      </ScrollArea>
     </div>
   );
 }

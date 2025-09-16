@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import ButtonNav from "@/components/Botoes/Bottom/button-nav";
+import BottomNav from "@/components/Botoes/Bottom/button-nav";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { ModeToggle } from "@/components/ui/mode-toggle";
@@ -16,17 +16,16 @@ export default function TelaInicial() {
 
   useEffect(() => {
     const userData = sessionStorage.getItem("user");
-    
+
     if (userData) {
       setUser(JSON.parse(userData));
     } else {
       router.push("/login");
     }
-    
+
     setLoading(false);
   }, [router]);
 
-  // Se ainda está carregando
   if (loading) {
     return (
       <div className="min-h-dvh flex items-center justify-center">
@@ -43,14 +42,14 @@ export default function TelaInicial() {
     <main className="min-h-dvh bg-background flex flex-col pt-6">
       <header className="flex justify-between px-6">
         <h1 className="text-2xl font-semibold text-zinc-900 dark:text-primary">
-          Olá, {user.nome || user.email}
+          Olá, {user.nome}
         </h1>
         <div className="flex items-center gap-4">
           <ModeToggle className="text-primary" />
           <MessageSquareText size={22} className="text-primary" />
         </div>
       </header>
-      
+
       <section className="px-6 mt-4 relative flex items-center gap-2">
         <div className="relative flex-1">
           <Input
@@ -65,10 +64,12 @@ export default function TelaInicial() {
         </Button>
       </section>
 
-      <ListagemAnuncios />
-      
-      <div className="mt-auto flex justify-center">
-        <ButtonNav />
+      <div className="">
+        <ListagemAnuncios />
+      </div>
+
+      <div className="fixed bottom-0 w-full flex justify-center">
+        <BottomNav />
       </div>
     </main>
   );
