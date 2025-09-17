@@ -1,10 +1,10 @@
-// app/anuncio/[id]/page.tsx (CLIENTE)
 "use client";
+
 import { useParams } from "next/navigation";
 import { useAnuncioById } from "@/hooks/useAnuncioById";
 import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, MapPin } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import BottomNav from "@/components/Botoes/Bottom/button-nav";
 

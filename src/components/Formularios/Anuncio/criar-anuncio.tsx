@@ -125,7 +125,6 @@ export default function CriarAnuncioForm({ usuario_id }: { usuario_id: number })
                 uploadPreset={config.uploadPreset}
                 apiKey={config.apiKey}
                 onChange={(urls) => {
-                  // Transforma para o formato [{ url_imagem, principal }]
                   const imagens = urls.map((url, idx) => ({
                     url_imagem: url,
                     principal: idx === 0,

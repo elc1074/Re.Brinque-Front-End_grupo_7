@@ -19,7 +19,7 @@ export async function POST(req: NextRequest) {
 
 
   response.cookies.set("id", id, {
-    httpOnly: true,
+    //httpOnly: true,
     secure: true,
     sameSite: "strict",
     path: "/",

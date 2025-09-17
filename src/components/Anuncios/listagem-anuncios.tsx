@@ -1,15 +1,13 @@
 "use client";
 
 import { useAnuncioMutation } from "@/hooks/useAnuncio";
-import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { ChevronLeft, ChevronRight, Loader2, MapPin } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { useRef } from "react";
+import { Loader2 } from "lucide-react";
 import IAnuncio from "@/interface/IAnuncio";
 import Link from "next/link";
 import Image from "next/image";
 import { ScrollArea } from "../ui/scroll-area";
+import { Skeleton } from "../ui/skeleton";
 
 export default function ListagemAnuncios() {
   const { anuncios, isPendingAnuncios, isErrorAnuncios } = useAnuncioMutation();
@@ -22,19 +20,6 @@ export default function ListagemAnuncios() {
       ? (anuncios as IAnuncio[])
       : [];
 
-  const getCondicaoColor = (condicao: string) => {
-    switch (condicao) {
-      case "NOVO":
-        return "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200";
-      case "SEMINOVO":
-        return "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200";
-      case "USADO":
-        return "bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200";
-      default:
-        return "bg-muted text-muted-foreground";
-    }
-  };
-
   const getTipoColor = (tipo: string) => {
     return tipo === "DOACAO"
       ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200 border-green-500 dark:border-green-300"
@@ -43,26 +28,18 @@ export default function ListagemAnuncios() {
 
   if (isPendingAnuncios) {
     return (
-      <div className="px-6 mt-6">
+      <div className="px-6 mt-6 pb-36">
         <h2 className="text-xl font-semibold mb-4 text-foreground items-center">
           <Loader2 className="animate-spin mr-2 inline-block text-primary" />
           Carregando Anúncios Recentes
         </h2>
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-          {[...Array(4)].map((_, i) => (
-            <Card key={i} className="animate-pulse">
-              <div className="aspect-square bg-muted rounded-t-lg" />
-              <CardContent className="p-4">
-                <div className="h-4 bg-muted rounded mb-2" />
-                <div className="h-3 bg-muted rounded mb-2 w-3/4" />
-                <div className="flex gap-2 mb-2">
-                  <div className="h-5 bg-muted rounded w-16" />
-                  <div className="h-5 bg-muted rounded w-12" />
-                </div>
-                <div className="h-3 bg-muted rounded w-1/2" />
-              </CardContent>
-            </Card>
-          ))}
+          <Skeleton className="h-[150px] w-[150px] rounded-xl" />
+          <Skeleton className="h-[150px] w-[150px] rounded-xl" />
+          <Skeleton className="h-[150px] w-[150px] rounded-xl" />
+          <Skeleton className="h-[150px] w-[150px] rounded-xl" />
+          <Skeleton className="h-[150px] w-[150px] rounded-xl" />
+          <Skeleton className="h-[150px] w-[150px] rounded-xl" />
         </div>
       </div>
     );

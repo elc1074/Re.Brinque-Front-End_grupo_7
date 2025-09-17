@@ -20,6 +20,7 @@ import {
   ShoppingBag,
 } from "lucide-react";
 import { useTheme } from "next-themes";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
@@ -55,7 +56,13 @@ function Row({
   );
 }
 
-function Switch({ checked, onChange }: { checked: boolean; onChange: (v: boolean) => void }) {
+function Switch({
+  checked,
+  onChange,
+}: {
+  checked: boolean;
+  onChange: (v: boolean) => void;
+}) {
   return (
     <span
       role="switch"
@@ -78,6 +85,18 @@ function Switch({ checked, onChange }: { checked: boolean; onChange: (v: boolean
   );
 }
 
+function getCookie(name: string) {
+  const value = `; ${document.cookie}`;
+  const parts = value.split(`; ${name}=`);
+  if (parts.length === 2) return parts.pop()?.split(";").shift();
+  return undefined;
+}
+
+const name = getCookie("nome");
+const id = getCookie("id");
+const userName = name ? decodeURIComponent(name) : "";
+const userInitials = userName ? userName.slice(0, 2).toUpperCase() : "";
+
 export default function PerfilPage() {
   const router = useRouter();
   const { theme, setTheme } = useTheme();
@@ -86,32 +105,27 @@ export default function PerfilPage() {
 
   const handleLogout = async () => {
     try {
-      // 1. Chamar API de logout para limpar o cookie no backend
       await fetch("/api/logout", { method: "POST" });
     } catch (error) {
       console.error("Erro na API de logout:", error);
     } finally {
-      // 2. Limpar sessionStorage (frontend)
-      sessionStorage.removeItem('user');
-      sessionStorage.removeItem('token');
-      sessionStorage.removeItem('auth_type');
-      
-      // 3. Redirecionar para login com reload completo
-      window.location.href = '/login';
+      router.push("/login");
     }
   };
 
   return (
-    <main className="min-h-dvh bg-background flex flex-col">
+    <main className="min-h-dvh bg-[#EBEEEC] dark:bg-zinc-800 flex flex-col">
       {/* Top header + avatar */}
-      <section className="bg-[#EBEEEC] dark:bg-zinc-800 rounded-b-2xl px-6 pt-6 pb-10">
-        <h1 className="text-2xl font-semibold text-zinc-900 dark:text-primary">Conta</h1>
+      <h1 className="text-2xl font-semibold text-zinc-900 dark:text-primary pt-4 pl-4 pb-2">
+        Conta
+      </h1>
 
+      <section className="bg-background rounded-t-2xl ">
         <div className="mt-6 flex flex-col items-center">
           <div className="relative">
             <Avatar className="h-20 w-20 text-lg">
               <AvatarFallback className="bg-zinc-200 text-zinc-700 dark:bg-zinc-700 dark:text-zinc-200">
-                LF
+                {userInitials}
               </AvatarFallback>
             </Avatar>
             <span className="absolute -bottom-1 -right-1 size-7 rounded-full bg-zinc-200 dark:bg-zinc-700 grid place-content-center border border-white dark:border-zinc-900">
@@ -119,42 +133,67 @@ export default function PerfilPage() {
             </span>
           </div>
           <div className="mt-3 flex items-center gap-2">
-            <p className="text-base font-medium text-zinc-800 dark:text-zinc-100">Lucas Ferreira</p>
+            <p className="text-base font-medium text-zinc-800 dark:text-zinc-100">
+              {userName}
+            </p>
             <PencilLine className="size-4 text-zinc-700 dark:text-zinc-300" />
           </div>
         </div>
       </section>
 
       {/* Content */}
-      <section className="px-6 py-4 space-y-6">
+      <section className=" bg-background px-6 py-4 space-y-6 pb-36">
         <div>
-          <h2 className="text-[15px] font-semibold text-zinc-800 dark:text-zinc-100 mb-1">Meus dados</h2>
+          <h2 className="text-[15px] font-semibold text-zinc-800 dark:text-zinc-100 mb-1">
+            Meus dados
+          </h2>
           <div className="bg-card rounded-2xl p-2">
-            <Row icon={<ShoppingBag className="size-5" />} label="Meus anúncios" />
+            <Link href={`/meus-anuncios/${id}`}>
+              <Row
+                icon={<ShoppingBag className="size-5" />}
+                label="Meus anúncios"
+              />
+            </Link>
             <Row icon={<Heart className="size-5" />} label="Favoritos" />
             <Row icon={<Bell className="size-5" />} label="Notificações" />
           </div>
         </div>
 
         <div>
-          <h2 className="text-[15px] font-semibold text-zinc-800 dark:text-zinc-100 mb-1">Preferências</h2>
+          <h2 className="text-[15px] font-semibold text-zinc-800 dark:text-zinc-100 mb-1">
+            Preferências
+          </h2>
           <div className="bg-card rounded-2xl p-2">
-            <Row icon={<Accessibility className="size-5" />} label="Acessibilidade" />
+            <Row
+              icon={<Accessibility className="size-5" />}
+              label="Acessibilidade"
+            />
             <Row
               icon={<Globe className="size-5" />}
               label="Idioma"
-              right={<span className="text-sm text-zinc-500 dark:text-zinc-300 mr-1">Português</span>}
+              right={
+                <span className="text-sm text-zinc-500 dark:text-zinc-300 mr-1">
+                  Português
+                </span>
+              }
             />
             <Row
               icon={<Moon className="size-5" />}
               label="Modo escuro"
-              right={<Switch checked={darkEnabled} onChange={(v) => setTheme(v ? "dark" : "light")} />}
+              right={
+                <Switch
+                  checked={darkEnabled}
+                  onChange={(v) => setTheme(v ? "dark" : "light")}
+                />
+              }
             />
           </div>
         </div>
 
         <div>
-          <h2 className="text-[15px] font-semibold text-zinc-800 dark:text-zinc-100 mb-1">Privacidade e segurança</h2>
+          <h2 className="text-[15px] font-semibold text-zinc-800 dark:text-zinc-100 mb-1">
+            Privacidade e segurança
+          </h2>
           <div className="bg-card rounded-2xl p-2">
             <Row icon={<Lock className="size-5" />} label="Alterar senha" />
             <Row
@@ -162,14 +201,22 @@ export default function PerfilPage() {
               label="Biometria"
               right={<Switch checked={biometria} onChange={setBiometria} />}
             />
-            <Row icon={<Bell className="size-5" />} label="Configurar notificações" />
+            <Row
+              icon={<Bell className="size-5" />}
+              label="Configurar notificações"
+            />
           </div>
         </div>
 
         <div>
-          <h2 className="text-[15px] font-semibold text-zinc-800 dark:text-zinc-100 mb-1">Ajuda</h2>
+          <h2 className="text-[15px] font-semibold text-zinc-800 dark:text-zinc-100 mb-1">
+            Ajuda
+          </h2>
           <div className="bg-card rounded-2xl p-2">
-            <Row icon={<CircleHelp className="size-5" />} label="Central de ajuda" />
+            <Row
+              icon={<CircleHelp className="size-5" />}
+              label="Central de ajuda"
+            />
             <Row icon={<FileText className="size-5" />} label="Termos de uso" />
           </div>
         </div>
@@ -185,7 +232,7 @@ export default function PerfilPage() {
         </div>
       </section>
 
-      <div className="mt-auto flex justify-center">
+      <div className="w-full fixed bottom-0 flex justify-center">
         <BottomNav />
       </div>
     </main>

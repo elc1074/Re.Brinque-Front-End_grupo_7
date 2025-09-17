@@ -4,8 +4,8 @@ import { useQuery } from "@tanstack/react-query";
 
 const URL_API = process.env.NEXT_PUBLIC_API_URL;
 
-async function getAnuncioByIdRequest(id: string): Promise<IAnuncio> {
-  const response = await fetch(`${URL_API}/api/anuncios/${id}`);
+async function getAnuncioUserRequest(id: string): Promise<IAnuncio> {
+  const response = await fetch(`${URL_API}/api/anuncios/usuario/${id}`);
   if (!response.ok) {
     throw new Error(await response.text());
   }
@@ -15,10 +15,10 @@ async function getAnuncioByIdRequest(id: string): Promise<IAnuncio> {
   return item as IAnuncio;
 }
 
-export function useAnuncioById(id?: string) {
+export function useAnuncioUser(id?: string) {
   const { data, isPending, isError, error } = useQuery<IAnuncio, Error>({
     queryKey: ["anuncio", id],
-    queryFn: () => getAnuncioByIdRequest(String(id)),
+    queryFn: () => getAnuncioUserRequest(String(id)),
     enabled: !!id,
   });
 

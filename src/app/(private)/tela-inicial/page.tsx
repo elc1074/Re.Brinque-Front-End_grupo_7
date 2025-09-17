@@ -1,7 +1,5 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
 import BottomNav from "@/components/Botoes/Bottom/button-nav";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -10,39 +8,22 @@ import { MessageSquareText, Search, SlidersHorizontal } from "lucide-react";
 import ListagemAnuncios from "@/components/Anuncios/listagem-anuncios";
 
 export default function TelaInicial() {
-  const [user, setUser] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
-  const router = useRouter();
 
-  useEffect(() => {
-    const userData = sessionStorage.getItem("user");
+ function getCookie(name: string) {
+   const value = `; ${document.cookie}`;
+   const parts = value.split(`; ${name}=`);
+   if (parts.length === 2) return parts.pop()?.split(";").shift();
+   return undefined;
+ }
 
-    if (userData) {
-      setUser(JSON.parse(userData));
-    } else {
-      router.push("/login");
-    }
-
-    setLoading(false);
-  }, [router]);
-
-  if (loading) {
-    return (
-      <div className="min-h-dvh flex items-center justify-center">
-        <p>Carregando...</p>
-      </div>
-    );
-  }
-
-  if (!user) {
-    return null;
-  }
+ const name = getCookie("nome");
+ const userName = name ? decodeURIComponent(name) : "";
 
   return (
     <main className="min-h-dvh bg-background flex flex-col pt-6">
       <header className="flex justify-between px-6">
         <h1 className="text-2xl font-semibold text-zinc-900 dark:text-primary">
-          Olá, {user.nome}
+          Olá, {userName}
         </h1>
         <div className="flex items-center gap-4">
           <ModeToggle className="text-primary" />

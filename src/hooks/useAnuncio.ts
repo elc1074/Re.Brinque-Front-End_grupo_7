@@ -1,4 +1,3 @@
-
 "use client";
 import IAnuncio, { IAnuncioResponse } from "@/interface/IAnuncio";
 import { useMutation, useQuery } from "@tanstack/react-query";
