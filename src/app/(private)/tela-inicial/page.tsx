@@ -9,12 +9,12 @@ import ListagemAnuncios from "@/components/Anuncios/listagem-anuncios";
 
 export default function TelaInicial() {
 
- function getCookie(name: string) {
-   const value = `; ${document.cookie}`;
-   const parts = value.split(`; ${name}=`);
-   if (parts.length === 2) return parts.pop()?.split(";").shift();
-   return undefined;
- }
+function getCookie(name: string) {
+  if (typeof document === "undefined") return undefined;
+  const value = `; ${document.cookie}`;
+  const parts = value.split(`; ${name}=`);
+  if (parts.length === 2) return parts.pop()?.split(";").shift();
+}
 
  const name = getCookie("nome");
  const userName = name ? decodeURIComponent(name) : "";
