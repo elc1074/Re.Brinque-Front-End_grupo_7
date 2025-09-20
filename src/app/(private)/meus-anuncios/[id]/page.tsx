@@ -117,7 +117,7 @@ export default function MeusAnunciosPage() {
             </TabsTrigger>
             <TabsTrigger
               value="finalizados"
-              className="w-full data-[state=active]:bg-primary data-[state=active]:bg-primary data-[state=active]:text-white"
+              className="w-full data-[state=active]:bg-primary dark:data-[state=active]:bg-primary data-[state=active]:text-white"
             >
               Finalizados
             </TabsTrigger>
