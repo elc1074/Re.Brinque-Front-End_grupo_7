@@ -100,10 +100,10 @@ export default function UploadFotos({
         <div className="flex flex-col items-center gap-2">
           {isUploading ? <Loader2 className="animate-spin" /> : <Upload />}
           <p className="text-sm">
-            Arraste imagens aqui ou <span className="underline">selecione</span>
+            <span>Selecione as imagens</span>
           </p>
           <p className="text-xs text-muted-foreground">
-            Até {max} imagens • PNG/JPG • &lt; 5MB
+            Até {max} imagens • PNG/JPG • &lt; 30MB
           </p>
         </div>
       </div>
@@ -125,10 +125,10 @@ export default function UploadFotos({
               <button
                 type="button"
                 onClick={() => removeAt(i)}
-                className="absolute top-1 right-1 p-1 rounded-full bg-black/60 text-white opacity-0 group-hover:opacity-100 transition"
+                className="absolute top-0 right-0 p-1 rounded-full bg-black/60 text-red-500 transition"
                 aria-label="Remover"
               >
-                <X className="h-4 w-4" />
+                <X className="!size-3" />
               </button>
             </div>
           ))}

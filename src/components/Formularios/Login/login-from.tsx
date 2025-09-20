@@ -123,7 +123,7 @@ export default function LoginForm() {
           )}
         </div>
 
-        <div className="text-right">
+        {/* <div className="text-right">
           <Button
             variant="link"
             className="text-sm text-primary hover:underline"
@@ -131,7 +131,7 @@ export default function LoginForm() {
           >
             Esqueci a senha
           </Button>
-        </div>
+        </div> */}
 
         <div className="pt-8">
           <GoogleLoginButton />

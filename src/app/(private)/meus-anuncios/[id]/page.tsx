@@ -15,8 +15,16 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
+import {
+  Dialog,
+  DialogTrigger,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
 import BottomNav from "@/components/Botoes/Bottom/button-nav";
-import { toast } from "sonner";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 function getCookie(name = "id") {
   const v = `; ${document.cookie}`;
@@ -69,8 +77,6 @@ export default function MeusAnunciosPage() {
   } = useAnuncioUser(userId);
   const del = useDeleteAnuncio();
 
-  const [tab, setTab] = useState<"publicados" | "finalizados">("publicados");
-
   const publicados = useMemo(
     () => anuncios.filter((a) => !isFinalizado(a)),
     [anuncios]
@@ -87,14 +93,12 @@ export default function MeusAnunciosPage() {
       </div>
     );
 
-  const lista = tab === "publicados" ? publicados : finalizados;
-
   return (
     <div className="min-h-dvh bg-background flex flex-col pt-6">
       {/* Header */}
-      <header className="flex items-center justify-between px-4">
+      <header className="flex justify-between px-4">
         <div className="flex items-center gap-3">
-          <Link href="/tela-inicial" aria-label="Voltar">
+          <Link href="/perfil" aria-label="Voltar">
             <ArrowLeft className="w-6 h-6" />
           </Link>
           <h1 className="text-xl font-semibold">Meus anúncios</h1>
@@ -103,108 +107,210 @@ export default function MeusAnunciosPage() {
 
       {/* Abas */}
       <div className="px-4 mt-4">
-        <div className="flex gap-2">
-          <button
-            onClick={() => setTab("publicados")}
-            className={`flex-1 rounded-full px-4 py-2 text-sm font-medium border
-              ${
-                tab === "publicados"
-                  ? "bg-primary text-primary-foreground"
-                  : "bg-muted text-foreground"
-              }`}
-          >
-            Publicados
-          </button>
-          <button
-            onClick={() => setTab("finalizados")}
-            className={`flex-1 rounded-full px-4 py-2 text-sm font-medium border
-              ${
-                tab === "finalizados"
-                  ? "bg-primary text-primary-foreground"
-                  : "bg-muted text-foreground"
-              }`}
-          >
-            Finalizados
-          </button>
-        </div>
-      </div>
-
-      {/* Lista */}
-      <div className="p-4 max-w-sm mx-auto w-full pb-44">
-        {lista.length === 0 && (
-          <p className="text-sm text-muted-foreground mt-6">
-            Nenhum anúncio {tab === "publicados" ? "publicado" : "finalizado"}.
-          </p>
-        )}
-
-        <ul className="space-y-3 mt-3">
-          {lista.map((a) => {
-            const thumb = getThumb(a);
-            const publicado = formatDate(getPublicacao(a));
-            return (
-              <li key={a.id} className="rounded-xl border bg-card">
-                <div className="flex items-start gap-3 p-3">
-                  <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-md bg-muted">
-                    {thumb ? (
-                      <Image
-                        src={thumb}
-                        alt={a.titulo}
-                        fill
-                        className="object-cover"
-                      />
-                    ) : null}
-                  </div>
-
-                  <div className="flex-1 min-w-0">
-                    <Link href={`/anuncio/${a.id}`} className="block">
-                      <p className="font-medium leading-tight line-clamp-2">
-                        {a.titulo}
-                      </p>
-                    </Link>
-                    <p className="text-xs text-muted-foreground mt-1">
-                      {formatPreco(a)} • Publicado {publicado}
-                    </p>
-                  </div>
-
-                  {/* Menu 3 pontos */}
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button size="icon" variant="ghost" className="h-8 w-8">
-                        <MoreVertical className="h-5 w-5" />
-                        <span className="sr-only">Mais ações</span>
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="w-48">
-                      <DropdownMenuItem
-                      onClick={() => toast("Não deu tempo pra fazer :c")}
-                        //onClick={() => router.push(`/anuncio/editar/${a.id}`)}
-                      >
-                        <Pencil className="h-4 w-4 mr-2" /> Editar anúncio
-                      </DropdownMenuItem>
-
-                      <DropdownMenuSeparator />
-
-                      <DropdownMenuItem
-                        className="text-destructive focus:text-destructive"
-                        onClick={async () => {
-                          if (
-                            !confirm(
-                              "Excluir este anúncio? Essa ação não pode ser desfeita."
-                            )
-                          )
-                            return;
-                          await del.mutateAsync(a.id);
-                        }}
-                      >
-                        <Trash2 className="h-4 w-4 mr-2" /> Excluir anúncio
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </div>
-              </li>
-            );
-          })}
-        </ul>
+        <Tabs defaultValue="publicados" className="w-full">
+          <TabsList className="w-full grid grid-cols-2 h-10 border border-primary">
+            <TabsTrigger
+              value="publicados"
+              className="w-full data-[state=active]:bg-primary dark:data-[state=active]:bg-primary data-[state=active]:text-white"
+            >
+              Publicados
+            </TabsTrigger>
+            <TabsTrigger
+              value="finalizados"
+              className="w-full data-[state=active]:bg-primary data-[state=active]:bg-primary data-[state=active]:text-white"
+            >
+              Finalizados
+            </TabsTrigger>
+          </TabsList>
+          <TabsContent value="publicados">
+            <div className="p-0 max-w-sm mx-auto w-full pb-44">
+              {publicados.length === 0 && (
+                <p className="text-sm text-muted-foreground mt-6">
+                  Nenhum anúncio publicado.
+                </p>
+              )}
+              <ul className="space-y-3 mt-3">
+                {publicados.map((a) => {
+                  const thumb = getThumb(a);
+                  const publicado = formatDate(getPublicacao(a));
+                  return (
+                    <li key={a.id} className="">
+                      <div className="flex items-start gap-3 p-3">
+                        <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-md bg-muted">
+                          {thumb ? (
+                            <Image
+                              src={thumb}
+                              alt={a.titulo}
+                              fill
+                              className="object-cover"
+                            />
+                          ) : null}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <Link href={`/anuncio/${a.id}`} className="block">
+                            <p className="font-medium leading-tight line-clamp-2">
+                              {a.titulo}
+                            </p>
+                          </Link>
+                          <p className="text-xs text-muted-foreground mt-1">
+                            {formatPreco(a)} • Publicado {publicado}
+                          </p>
+                        </div>
+                        {/* Menu 3 pontos */}
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button
+                              size="icon"
+                              variant="ghost"
+                              className="h-8 w-8"
+                            >
+                              <MoreVertical className="h-5 w-5" />
+                              <span className="sr-only">Mais ações</span>
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent
+                            align="end"
+                            className="w-48 border-2 shadow-lg dark:border-zinc-800"
+                          >
+                            <DropdownMenuItem
+                              onClick={() =>
+                                router.push(`/anuncio/editar/${a.id}`)
+                              }
+                            >
+                              <Pencil className="h-4 w-4 mr-2" /> Editar anúncio
+                            </DropdownMenuItem>
+                            <DropdownMenuSeparator />
+                            <Dialog>
+                              <DialogTrigger asChild>
+                                <DropdownMenuItem className="text-destructive focus:text-destructive">
+                                  <Trash2 className="h-4 w-4 mr-2" /> Excluir
+                                  anúncio
+                                </DropdownMenuItem>
+                              </DialogTrigger>
+                              <DialogContent>
+                                <DialogHeader>
+                                  <DialogTitle>Excluir anúncio</DialogTitle>
+                                </DialogHeader>
+                                <p className="text-sm mb-4">
+                                  Tem certeza que deseja excluir este anúncio?
+                                  Essa ação não pode ser desfeita.
+                                </p>
+                                <DialogFooter>
+                                  <Button
+                                    variant="outline"
+                                    onClick={() =>
+                                      document.activeElement &&
+                                      (
+                                        document.activeElement as HTMLElement
+                                      ).blur()
+                                    }
+                                  >
+                                    Cancelar
+                                  </Button>
+                                  <Button
+                                    variant="destructive"
+                                    onClick={async () => {
+                                      await del.mutateAsync(a.id);
+                                      document.activeElement &&
+                                        (
+                                          document.activeElement as HTMLElement
+                                        ).blur();
+                                    }}
+                                  >
+                                    Excluir
+                                  </Button>
+                                </DialogFooter>
+                              </DialogContent>
+                            </Dialog>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </div>
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+          </TabsContent>
+          <TabsContent value="finalizados">
+            <div className="p-0 max-w-sm mx-auto w-full pb-44">
+              {finalizados.length === 0 && (
+                <p className="text-sm text-muted-foreground mt-6">
+                  Nenhum anúncio finalizado.
+                </p>
+              )}
+              <ul className="space-y-3 mt-3">
+                {finalizados.map((a) => {
+                  const thumb = getThumb(a);
+                  const publicado = formatDate(getPublicacao(a));
+                  return (
+                    <li key={a.id} className="bg-">
+                      <div className="flex items-start gap-3 p-3">
+                        <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-md bg-muted">
+                          {thumb ? (
+                            <Image
+                              src={thumb}
+                              alt={a.titulo}
+                              fill
+                              className="object-cover"
+                            />
+                          ) : null}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <Link href={`/anuncio/${a.id}`} className="block">
+                            <p className="font-medium leading-tight line-clamp-2">
+                              {a.titulo}
+                            </p>
+                          </Link>
+                          <p className="text-xs text-muted-foreground mt-1">
+                            {formatPreco(a)} • Publicado {publicado}
+                          </p>
+                        </div>
+                        {/* Menu 3 pontos */}
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button
+                              size="icon"
+                              variant="ghost"
+                              className="h-8 w-8"
+                            >
+                              <MoreVertical className="h-5 w-5" />
+                              <span className="sr-only">Mais ações</span>
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end" className="w-48">
+                            <DropdownMenuItem
+                              onClick={() =>
+                                router.push(`/anuncio/editar/${a.id}`)
+                              }
+                            >
+                              <Pencil className="h-4 w-4 mr-2" /> Editar anúncio
+                            </DropdownMenuItem>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem
+                              className="text-destructive focus:text-destructive"
+                              onClick={async () => {
+                                if (
+                                  !confirm(
+                                    "Excluir este anúncio? Essa ação não pode ser desfeita."
+                                  )
+                                )
+                                  return;
+                                await del.mutateAsync(a.id);
+                              }}
+                            >
+                              <Trash2 className="h-4 w-4 mr-2" /> Excluir
+                              anúncio
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </div>
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+          </TabsContent>
+        </Tabs>
       </div>
 
       <div className="fixed bottom-0 w-full flex justify-center">

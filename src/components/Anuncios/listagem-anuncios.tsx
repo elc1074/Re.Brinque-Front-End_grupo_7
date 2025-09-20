@@ -113,22 +113,9 @@ export default function ListagemAnuncios() {
                   {anuncio.tipo}
                 </Badge>
                 <h3 className="text-foreground">{anuncio.titulo}</h3>
-                {anuncio.marca && (
                   <p className="text-sm text-muted-foreground">
-                    {anuncio.marca}
+                    {anuncio.marca || "Sem marca"}
                   </p>
-                )}
-                {/* <Badge className={getCondicaoColor(anuncio.condicao)}>
-                      {anuncio.condicao}
-                      </Badge> */}
-                {/* {anuncio.endereco_completo && (
-                    <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                    <MapPin className="h-3 w-3" />
-                    <span className="truncate">
-                    {anuncio.endereco_completo}
-                    </span>
-                    </div>
-                    )} */}
               </div>
             </Link>
           ))}

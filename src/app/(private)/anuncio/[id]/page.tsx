@@ -7,10 +7,31 @@ import { Badge } from "@/components/ui/badge";
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import BottomNav from "@/components/Botoes/Bottom/button-nav";
+import ImageCarousel from "@/components/Anuncios/Anuncio-image";
 
 export default function AnuncioPage() {
   const { id } = useParams<{ id: string }>();
   const { anuncio, isPending, isError, error } = useAnuncioById(id);
+
+  
+  const categorias = [
+    { id: 1, nome: "Artísticos", icon: "🎨" },
+    { id: 2, nome: "Aventura", icon: "🏔️" },
+    { id: 3, nome: "Bonecos", icon: "🤖" },
+    { id: 4, nome: "Carrinhos", icon: "🚗" },
+    { id: 5, nome: "Cartas", icon: "🃏" },
+    { id: 6, nome: "Educativos", icon: "📚" },
+    { id: 7, nome: "Esportes", icon: "⚽" },
+    { id: 8, nome: "Estratégia", icon: "♟️" },
+    { id: 9, nome: "Palavras", icon: "📝" },
+    { id: 10, nome: "Para bebês", icon: "👶" },
+    { id: 11, nome: "Quebra-cabeças", icon: "🧩" },
+    { id: 12, nome: "Simulação", icon: "🎮" },
+    { id: 13, nome: "Tabuleiros", icon: "🎲" },
+    { id: 14, nome: "Videogames", icon: "🎮" },
+  ];
+  
+  const categoria_id = categorias.find((c) => c.id === anuncio?.categoria_id);
 
   const getCondicaoColor = (condicao: string) => {
     switch (condicao) {
@@ -39,6 +60,14 @@ export default function AnuncioPage() {
   if (!anuncio)
     return <div className="p-8 text-center">Anúncio não encontrado.</div>;
 
+  const imagensNormalizadas = Array.isArray(anuncio.imagens)
+    ? anuncio.imagens
+        .map((img: any) =>
+          typeof img === "string" ? { url_imagem: img } : img
+        )
+        .filter((img: any) => img && typeof img.url_imagem === "string")
+    : [];
+
   return (
     <div className="min-h-dvh bg-background flex flex-col pt-6">
       {/* Header */}
@@ -53,62 +82,61 @@ export default function AnuncioPage() {
         </div>
       </header>
 
-      <div className="p-4 max-w-sm mx-auto w-full pb-44">
-        <div className="aspect-square overflow-hidden rounded-lg bg-muted">
-          {anuncio.imagens && anuncio.imagens.length > 0 ? (
-            (() => {
-              const principal = Array.isArray(anuncio.imagens)
-                ? (anuncio.imagens.find(
-                    (img: any) =>
-                      typeof img === "object" &&
-                      img !== null &&
-                      "url_imagem" in img &&
-                      img.principal
-                  ) as { url_imagem: string; principal: boolean } | undefined)
-                : undefined;
-              return principal ? (
-                <Image
-                  src={principal.url_imagem}
-                  alt={anuncio.titulo}
-                  className="object-cover w-full h-full"
-                  width={200}
-                  height={200}
-                />
-              ) : (
-                <div className="flex items-center justify-center h-full text-muted-foreground">
-                  <span className="text-sm">Sem imagem principal</span>
-                </div>
-              );
-            })()
-          ) : (
-            <div className="flex items-center justify-center h-full text-muted-foreground">
-              <span className="text-sm">Sem imagem</span>
-            </div>
-          )}
+      <div className="pt-6 max-w-sm mx-auto w-full pb-44">
+        <div className="aspect-square overflow-hidden">
+          <ImageCarousel
+            imagens={imagensNormalizadas}
+            titulo={anuncio.titulo}
+          />
         </div>
-        <h1 className="text-2xl font-bold mb-2 text-foreground">
+
+        {/* Titulo */}
+        <h1 className="pt-4 pb-2 text-2xl font-bold mb-2 text-foreground">
           {anuncio.titulo}
         </h1>
-        {anuncio.marca && (
-          <p className="text-sm text-muted-foreground mb-2">{anuncio.marca}</p>
-        )}
 
-        <div className="flex gap-3 mb-2">
-          <Badge className={getCondicaoColor(anuncio.condicao)}>
-            {anuncio.condicao}
-          </Badge>
-          <Badge className={getTipoColor(anuncio.tipo)}>{anuncio.tipo}</Badge>
-        </div>
+        <div className="grid grid-cols-2 gap-4 mb-4">
+          {/* Marca */}
+          <div className="flex-col">
+            <p className="font-semibold">Marca </p>
+            <span className="text-muted-foreground">
+              {anuncio.marca || "Sem marca"}
+            </span>
+          </div>
 
-        {/* {anuncio.endereco_completo && (
+          <div className="flex-col">
+            <p className="font-semibold">Condição </p>
+            <Badge className={getCondicaoColor(anuncio.condicao)}>
+              {anuncio.condicao}
+            </Badge>
+          </div>
+
+          <div className="flex-col">
+            <p className="font-semibold">Tipo </p>
+            <Badge className={getTipoColor(anuncio.tipo)}>{anuncio.tipo}</Badge>
+          </div>
+
+          {/* {anuncio.endereco_completo && (
           <div className="flex items-center gap-1 text-xs text-muted-foreground mb-4">
             <MapPin className="h-4 w-4" />
             <span>{anuncio.endereco_completo}</span>
           </div>
         )} */}
 
-        <p className="font-semibold">Descrição: </p>
-        <p className="text-base text-foreground mb-4">{anuncio.descricao}</p>
+          {anuncio.categoria_id && (
+            <div className="flex-col">
+              <p className="font-semibold">Categoria </p>
+              <span className="text-muted-foreground">
+                {categoria_id
+                  ? `${categoria_id.icon} ${categoria_id.nome}`
+                  : "Sem categoria"}
+              </span>
+            </div>
+          )}
+
+        </div>
+          <p className="font-semibold">Descrição</p>
+          <p className="text-base text-foreground mb-4">{anuncio.descricao}</p>
       </div>
 
       <div className="fixed bottom-0 w-full flex justify-center">

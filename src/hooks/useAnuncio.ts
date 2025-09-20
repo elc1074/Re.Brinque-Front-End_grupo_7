@@ -97,3 +97,29 @@ export function useAnuncioById(id: string) {
     error,
   };
 }
+
+export async function updateAnuncioRequest(id: string, data: Partial<IAnuncio>) {
+  const token = typeof document !== "undefined"
+    ? document.cookie.match(/token=([^;]+)/)?.[1]
+    : undefined;
+
+  const headers: Record<string, string> = {
+    "Content-Type": "application/json",
+  };
+  if (token) headers.Authorization = `Bearer ${token}`;
+
+  const res = await fetch(`${URL_API}/api/anuncios/${id}`, {
+    method: "PUT",
+    headers,
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) throw new Error(await res.text());
+  return await res.json();
+}
+
+export function useUpdateAnuncio() {
+  return useMutation({
+    mutationFn: ({ id, data }: { id: string; data: Partial<IAnuncio> }) =>
+      updateAnuncioRequest(id, data),
+  });
+}
