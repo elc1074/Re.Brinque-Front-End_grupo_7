@@ -9,16 +9,46 @@ import Image from "next/image";
 import { ScrollArea } from "../ui/scroll-area";
 import { Skeleton } from "../ui/skeleton";
 
-export default function ListagemAnuncios() {
+type Props = {
+  busca?: string;
+  categoriaId?: string;
+  tipo?: string;
+  condicao?: string;
+};
+
+export default function ListagemAnuncios({ busca = "", categoriaId = "all", tipo = "all", condicao = "all" }: Props) {
   const { anuncios, isPendingAnuncios, isErrorAnuncios } = useAnuncioMutation();
 
   // Garante que lista sempre será um array de anúncios
-  const lista: IAnuncio[] =
+  let lista: IAnuncio[] =
     anuncios && typeof anuncios === "object" && "anuncios" in anuncios
       ? (anuncios as { anuncios: IAnuncio[] }).anuncios
       : Array.isArray(anuncios)
       ? (anuncios as IAnuncio[])
       : [];
+
+  // Filtro de busca por título
+  if (busca && busca.trim() !== "") {
+    const buscaLower = busca.trim().toLowerCase();
+    lista = lista.filter((anuncio) =>
+      anuncio.titulo.toLowerCase().includes(buscaLower)
+    );
+  }
+
+  // Filtro por categoria
+  if (categoriaId && categoriaId !== "all") {
+    lista = lista.filter((anuncio) => String(anuncio.categoria_id) === categoriaId);
+  }
+
+  // Filtro por tipo
+  if (tipo && tipo !== "all") {
+    lista = lista.filter((anuncio) => anuncio.tipo === tipo);
+  }
+
+  // Filtro por condição
+  if (condicao && condicao !== "all") {
+    lista = lista.filter((anuncio) => anuncio.condicao === condicao);
+  }
 
   const getTipoColor = (tipo: string) => {
     return tipo === "DOACAO"

@@ -1,10 +1,8 @@
-// src/components/UploadFotos.tsx
 "use client";
 
 import { useState, useRef } from "react";
 import Image from "next/image";
 import { X, Loader2, Upload } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 
 type Props = {
@@ -13,7 +11,7 @@ type Props = {
   uploadPreset: string;
   value: string[];
   onChange: (urls: string[]) => void;
-  max?: number; // ex.: 6
+  max?: number;
 };
 
 export default function UploadFotos({
@@ -36,10 +34,8 @@ export default function UploadFotos({
     try {
       const uploaded: string[] = [];
       for (const file of filesArr) {
-        // validações simples
         if (!file.type.startsWith("image/")) continue;
-        if (file.size > 30 * 1024 * 1024) {
-          // 30MB
+        if (file.size > 30 * 1024 * 1024) { // 30MB
           toast.error(`${file.name} arquivo muito grande! Tente outro.`);
           continue;
         }
@@ -140,14 +136,14 @@ export default function UploadFotos({
       </div>
 
       {/* Botão alternativo para reabrir seletor */}
-      <Button
+      {/* <Button
         type="button"
         variant="outline"
         onClick={() => inputRef.current?.click()}
         disabled={isUploading || value.length >= max}
       >
         {isUploading ? "Enviando..." : "Adicionar fotos"}
-      </Button>
+      </Button> */}
     </div>
   );
 }

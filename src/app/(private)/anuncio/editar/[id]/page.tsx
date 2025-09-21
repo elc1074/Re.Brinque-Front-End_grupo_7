@@ -4,7 +4,7 @@ import { useParams, useRouter } from "next/navigation";
 import { useAnuncioById } from "@/hooks/useAnuncioById";
 import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Loader2, Save } from "lucide-react";
 import Link from "next/link";
 import BottomNav from "@/components/Botoes/Bottom/button-nav";
 import ImageCarousel from "@/components/Anuncios/Anuncio-image";
@@ -26,12 +26,20 @@ import {
   SelectItem,
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { Textarea } from "@/components/ui/textarea";
 
 export default function AnuncioPage() {
   const { id } = useParams<{ id: string }>();
   const { anuncio, isPending, isError, error } = useAnuncioById(id);
+  const updateAnuncio = useUpdateAnuncio();
+  const [imagens, setImagens] = useState<string[]>([]);
   const router = useRouter();
+  const {
+    config: cloudConfig,
+    loading: loadingCloud,
+    error: cloudErr,
+  } = useCloudinaryConfig();
 
   const categorias = [
     { id: 1, nome: "Artísticos", icon: "🎨" },
@@ -51,7 +59,6 @@ export default function AnuncioPage() {
   ];
   const condicoes = [
     { value: "NOVO", label: "Novo" },
-    { value: "SEMINOVO", label: "Seminovo" },
     { value: "USADO", label: "Usado" },
   ] as const;
 
@@ -60,11 +67,11 @@ export default function AnuncioPage() {
     { value: "DOACAO", label: "Doação" },
   ] as const;
 
-  const statuses = [
-    { value: "DISPONIVEL", label: "Disponível" },
-    { value: "NEGOCIANDO", label: "Negociando" },
-    { value: "FINALIZADO", label: "Finalizado" },
-  ] as const;
+  // const statuses = [
+  //   { value: "DISPONIVEL", label: "Disponível" },
+  //   { value: "NEGOCIANDO", label: "Negociando" },
+  //   { value: "FINALIZADO", label: "Finalizado" },
+  // ] as const;
 
   type CriarAnuncioSchemaType = z.infer<typeof criarAnuncioSchema>;
 
@@ -74,6 +81,7 @@ export default function AnuncioPage() {
     control,
     formState: { errors },
     reset,
+    setValue,
   } = useForm<CriarAnuncioSchemaType>({
     resolver: zodResolver(criarAnuncioSchema),
     defaultValues: {
@@ -89,6 +97,14 @@ export default function AnuncioPage() {
   });
 
   useEffect(() => {
+    const imgs = imagens.map((url, idx) => ({
+      url_imagem: url,
+      principal: idx === 0,
+    }));
+    setValue("imagens", imgs, { shouldValidate: true, shouldDirty: true });
+  }, [imagens, setValue]);
+
+  useEffect(() => {
     if (anuncio) {
       reset({
         titulo: anuncio.titulo,
@@ -100,6 +116,15 @@ export default function AnuncioPage() {
         status: anuncio.status,
         imagens: [],
       });
+      setImagens(
+        Array.isArray(anuncio.imagens)
+          ? anuncio.imagens
+              .map((img: any) =>
+                typeof img === "string" ? img : img.url_imagem
+              )
+              .filter((url: any) => typeof url === "string")
+          : []
+      );
     }
   }, [anuncio, reset]);
 
@@ -111,26 +136,23 @@ export default function AnuncioPage() {
   if (!anuncio)
     return <div className="p-8 text-center">Anúncio não encontrado.</div>;
 
-  const imagensNormalizadas = Array.isArray(anuncio.imagens)
-    ? anuncio.imagens
-        .map((img: any) =>
-          typeof img === "string" ? { url_imagem: img } : img
-        )
-        .filter((img: any) => img && typeof img.url_imagem === "string")
-    : [];
-
   async function onSubmit(data: CriarAnuncioSchemaType) {
+    const imagensPayload = imagens.map((url, idx) => ({
+      url_imagem: url,
+      principal: idx === 0,
+    }));
     const payload = {
       ...data,
       categoria_id: data.categoria_id === null ? undefined : data.categoria_id,
+      imagens: imagensPayload,
     };
     try {
-      const result = await updateAnuncioRequest(id, payload);
+      const result = await updateAnuncio.mutateAsync({ id, data: payload });
       if (result?.error) {
         return toast.error(result.error);
       }
       toast.success("Anúncio atualizado com sucesso!");
-      router.push("/tela-inicial");
+      router.back();
     } catch (e: any) {
       console.error("Erro ao atualizar anúncio:", e);
       toast.error(e.message);
@@ -143,28 +165,58 @@ export default function AnuncioPage() {
         {/* Header */}
         <header className="flex justify-between px-6">
           <div className="flex items-center space-x-4">
-            <Link href="/perfil">
+            <button type="button" onClick={() => router.back()}>
               <ArrowLeft className="w-6 h-6" />
-            </Link>
-            <h1 className="text-2xl font-semibold text-zinc-900 dark:text-primary">
+            </button>
+            <h1 className="text-2xl font-semibold text-zinc-900 dark:text-white">
               Voltar
             </h1>
           </div>
         </header>
 
         <div className="pt-6 max-w-sm mx-auto w-full pb-44">
-          <div className="aspect-square overflow-hidden">
+          {/* UploadFotos para editar imagens */}
+          <div className="mb-4">
+            {cloudErr && (
+              <span className="text-red-500 text-sm">
+                Erro ao carregar config do Cloudinary: {cloudErr}
+              </span>
+            )}
+            {loadingCloud ? (
+              <div className="text-sm text-muted-foreground flex items-center">
+                <span>
+                  <Loader2 className="animate-spin text-primary mr-2" />
+                </span>
+                Carregando imagens…
+              </div>
+            ) : cloudConfig ? (
+              <UploadFotos
+                cloudName={cloudConfig.cloudName}
+                value={imagens}
+                uploadPreset={cloudConfig.uploadPreset}
+                apiKey={cloudConfig.apiKey}
+                onChange={setImagens}
+                max={6}
+              />
+            ) : (
+              <div className="text-sm text-red-500">
+                Não foi possível obter as configurações do Cloudinary.
+              </div>
+            )}
+          </div>
+          {/* Preview das imagens (opcional) */}
+          {/* <div className="aspect-square overflow-hidden">
             <ImageCarousel
-              imagens={imagensNormalizadas}
+              imagens={imagens.map((url) => ({ url_imagem: url }))}
               titulo={anuncio.titulo}
             />
-          </div>
+          </div> */}
 
-          <div className="space-y-2">
+          <div className="space-y-2 mb-6">
             <Label htmlFor="titulo">Titulo</Label>
             <Input
               id="titulo"
-              type="titulo"
+              type="text"
               placeholder="Insira um Titulo"
               {...register("titulo")}
               required
@@ -180,11 +232,11 @@ export default function AnuncioPage() {
 
           <div className="grid grid-cols-2 gap-4 mb-4">
             {/* Marca */}
-            <div className="flex-col">
-              <Label htmlFor="marca">Marca </Label>
+            <div className="flex-col space-y-2">
+              <Label htmlFor="marca">Marca</Label>
               <Input
                 id="marca"
-                type="marca"
+                type="text"
                 placeholder="Insira um marca"
                 {...register("marca")}
                 aria-invalid={!!errors.marca}
@@ -192,7 +244,7 @@ export default function AnuncioPage() {
               />
             </div>
 
-            <div className="flex-col">
+            <div className="flex-col space-y-2">
               <Label htmlFor="condicao">Condição</Label>
               <Controller
                 name="condicao"
@@ -202,7 +254,10 @@ export default function AnuncioPage() {
                     value={field.value ?? ""}
                     onValueChange={field.onChange}
                   >
-                    <SelectTrigger id="condicao">
+                    <SelectTrigger
+                      className="data-[size=default]:h-12 rounded-2xl w-[175px]"
+                      id="condicao"
+                    >
                       <SelectValue placeholder="Selecione a condição" />
                     </SelectTrigger>
                     <SelectContent>
@@ -222,7 +277,7 @@ export default function AnuncioPage() {
               )}
             </div>
 
-            <div className="flex-col">
+            <div className="flex-col space-y-2">
               <Label htmlFor="tipo">Tipo</Label>
               <Controller
                 name="tipo"
@@ -232,7 +287,10 @@ export default function AnuncioPage() {
                     value={field.value ?? ""}
                     onValueChange={field.onChange}
                   >
-                    <SelectTrigger id="tipo">
+                    <SelectTrigger
+                      className="data-[size=default]:h-12 rounded-2xl w-[175px]"
+                      id="tipo"
+                    >
                       <SelectValue placeholder="Selecione o tipo" />
                     </SelectTrigger>
                     <SelectContent>
@@ -260,7 +318,7 @@ export default function AnuncioPage() {
         )} */}
 
             {anuncio.categoria_id && (
-              <div className="flex-col">
+              <div className="flex-col space-y-2">
                 <Label htmlFor="categoria_id">Categoria</Label>
                 <Controller
                   name="categoria_id"
@@ -270,7 +328,10 @@ export default function AnuncioPage() {
                       value={field.value ? String(field.value) : ""}
                       onValueChange={(v) => field.onChange(Number(v))}
                     >
-                      <SelectTrigger id="categoria_id">
+                      <SelectTrigger
+                        className="data-[size=default]:h-12 rounded-2xl w-[175px]"
+                        id="categoria_id"
+                      >
                         <SelectValue placeholder="Selecione a categoria" />
                       </SelectTrigger>
                       <SelectContent>
@@ -294,7 +355,7 @@ export default function AnuncioPage() {
               </div>
             )}
 
-            {/* <div className="flex-col">
+            {/* <div className="flex-col space-y-2">
               <Label htmlFor="status">Status</Label>
               <Controller
                 name="status"
@@ -325,9 +386,8 @@ export default function AnuncioPage() {
             </div> */}
           </div>
           <p className="font-semibold">Descrição</p>
-          <Input
+          <Textarea
             id="descricao"
-            type="descricao"
             placeholder="Insira um descricao"
             {...register("descricao")}
             required
@@ -335,7 +395,21 @@ export default function AnuncioPage() {
             aria-describedby={errors.descricao ? "descricao-error" : undefined}
           />
           <div>
-            <Button type="submit">Salvar Alterações</Button>
+            <Button
+              disabled={updateAnuncio.isPending}
+              className="w-full h-12 text-base font-medium dark:text-white mt-6"
+              type="submit"
+            >
+              {updateAnuncio.isPending ? (
+                <span className="flex items-center gap-2">
+                  <Loader2 className="animate-spin" /> Salvando...
+                </span>
+              ) : (
+                <span className="flex items-center gap-2">
+                  <Save /> Salvar Alterações
+                </span>
+              )}
+            </Button>
           </div>
         </div>
 
