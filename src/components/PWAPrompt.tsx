@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
+import logo from '@/assets/image.png';
 
 export default function PWAPrompt() {
   const [show, setShow] = useState(false);
@@ -53,7 +54,7 @@ export default function PWAPrompt() {
       <DialogContent>
         <DialogHeader className="flex items-center justify-center gap-2">
             <Image 
-            src="/icons/icon-192x192.png"
+            src={logo}
             alt="App Icon"
             width={48}
             height={48}
@@ -63,7 +64,7 @@ export default function PWAPrompt() {
         <div className="py-2 text-center">
           Para uma experiência melhor, instale o app na sua tela inicial.
         </div>
-        <DialogFooter>
+        <DialogFooter className="justify-center gap-2">
           <Button onClick={handleInstall} autoFocus>
             Instalar
           </Button>

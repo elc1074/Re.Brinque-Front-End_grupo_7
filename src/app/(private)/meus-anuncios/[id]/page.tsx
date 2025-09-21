@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
+import { Loader2 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -25,6 +26,7 @@ import {
 } from "@/components/ui/dialog";
 import BottomNav from "@/components/Botoes/Bottom/button-nav";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { toast } from "sonner";
 
 function getCookie(name = "id") {
   const v = `; ${document.cookie}`;
@@ -67,6 +69,12 @@ function getThumb(a: Anuncio) {
 }
 
 export default function MeusAnunciosPage() {
+  // Estado para controlar o Dialog de exclusão por anúncio
+  const [openDialogId, setOpenDialogId] = useState<string | null>(null);
+  // Estado para controlar o DropdownMenu por anúncio
+  const [openMenuId, setOpenMenuId] = useState<string | null>(null);
+  // Estado de loading individual para exclusão
+  const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
   const router = useRouter();
   const userId = getCookie("id");
   const {
@@ -157,12 +165,23 @@ export default function MeusAnunciosPage() {
                           </p>
                         </div>
                         {/* Menu 3 pontos */}
-                        <DropdownMenu>
+                        <DropdownMenu
+                          open={openMenuId === a.id || openDialogId === a.id}
+                          onOpenChange={open => {
+                            if (open) {
+                              setOpenMenuId(a.id);
+                            } else {
+                              setOpenMenuId(null);
+                              setOpenDialogId(null);
+                            }
+                          }}
+                        >
                           <DropdownMenuTrigger asChild>
                             <Button
                               size="icon"
                               variant="ghost"
                               className="h-8 w-8"
+                              onClick={() => setOpenMenuId(a.id)}
                             >
                               <MoreVertical className="h-5 w-5" />
                               <span className="sr-only">Mais ações</span>
@@ -180,9 +199,18 @@ export default function MeusAnunciosPage() {
                               <Pencil className="h-4 w-4 mr-2" /> Editar anúncio
                             </DropdownMenuItem>
                             <DropdownMenuSeparator />
-                            <Dialog>
+                            <Dialog
+                              open={openDialogId === a.id}
+                              onOpenChange={(open) =>
+                                setOpenDialogId(open ? a.id : null)
+                              }
+                            >
                               <DialogTrigger asChild>
-                                <DropdownMenuItem className="text-destructive focus:text-destructive">
+                                <DropdownMenuItem
+                                  className="text-destructive focus:text-destructive"
+                                  onSelect={e => e.preventDefault()}
+                                  onClick={() => setOpenDialogId(a.id)}
+                                >
                                   <Trash2 className="h-4 w-4 mr-2" /> Excluir
                                   anúncio
                                 </DropdownMenuItem>
@@ -198,26 +226,29 @@ export default function MeusAnunciosPage() {
                                 <DialogFooter>
                                   <Button
                                     variant="outline"
-                                    onClick={() =>
-                                      document.activeElement &&
-                                      (
-                                        document.activeElement as HTMLElement
-                                      ).blur()
-                                    }
+                                    onClick={() => setOpenDialogId(null)}
                                   >
                                     Cancelar
                                   </Button>
                                   <Button
                                     variant="destructive"
+                                    disabled={pendingDeleteId === a.id}
                                     onClick={async () => {
-                                      await del.mutateAsync(a.id);
-                                      document.activeElement &&
-                                        (
-                                          document.activeElement as HTMLElement
-                                        ).blur();
+                                      setPendingDeleteId(a.id);
+                                      try {
+                                        await del.mutateAsync(a.id);
+                                        setOpenDialogId(null);
+                                        toast.success("Anúncio excluído com sucesso");
+                                      } finally {
+                                        setPendingDeleteId(null);
+                                      }
                                     }}
                                   >
-                                    Excluir
+                                    {pendingDeleteId === a.id ? (
+                                      <span className="flex items-center gap-2"><Loader2 className="animate-spin w-4 h-4" /> Excluindo...</span>
+                                    ) : (
+                                      "Excluir"
+                                    )}
                                   </Button>
                                 </DialogFooter>
                               </DialogContent>
