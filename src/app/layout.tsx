@@ -5,7 +5,6 @@ import "./globals.css";
 import { ThemeProvider } from "@/components/ui/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import GoogleSyncHandler from "@/components/Google/GoogleSyncHandler";
 
 const queryClient = new QueryClient();
 
@@ -34,7 +33,6 @@ export default function RootLayout({
             enableSystem
             disableTransitionOnChange
           >
-            <GoogleSyncHandler />
             {children}
             <Toaster richColors position="top-center" />
           </ThemeProvider>
