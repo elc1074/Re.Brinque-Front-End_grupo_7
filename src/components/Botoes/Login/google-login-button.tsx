@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 
 export default function GoogleLoginButton() {
   const handleGoogleLogin = () => {
-    const redirectURI = "https://front-re-brinque.vercel.app";
+    const redirectURI = "https://front-re-brinque.vercel.app/google-callback";
     
     const googleAuthUrl = new URL('https://accounts.google.com/o/oauth2/v2/auth');
     googleAuthUrl.searchParams.append('client_id', '634300399694-ht7h5q80m2kndot2204p4eba47v44plm.apps.googleusercontent.com');

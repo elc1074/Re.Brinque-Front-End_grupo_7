@@ -28,7 +28,7 @@ export default function GoogleSyncHandler() {
               credentials: 'include',
               body: JSON.stringify({
                 code: code,
-                redirect_uri: 'https://front-re-brinque.vercel.app'
+                redirect_uri: 'https://front-re-brinque.vercel.app/google-callback'
               }),
             });
     
@@ -42,7 +42,7 @@ export default function GoogleSyncHandler() {
                   body: JSON.stringify({
                     token: data.token,
                     id: data.usuario?.id,
-                    nome: data.usuario?.nome,
+                    nome: data.usuario?.nome_completo,
                     email: data.usuario?.email,
                   }),
                 });
