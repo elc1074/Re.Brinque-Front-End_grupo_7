@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { useAnuncioById } from "@/hooks/useAnuncioById";
 import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
@@ -8,12 +8,40 @@ import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import BottomNav from "@/components/Botoes/Bottom/button-nav";
 import ImageCarousel from "@/components/Anuncios/Anuncio-image";
+import { api, getTokenFromCookies, setAuthHeader } from "@/lib/api";
 
 export default function AnuncioPage() {
   const { id } = useParams<{ id: string }>();
+  const router = useRouter();
   const { anuncio, isPending, isError, error } = useAnuncioById(id);
 
-  
+  const getCookie = (name: string) => {
+    if (typeof document === "undefined") return undefined;
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) return parts.pop()?.split(";").shift();
+  };
+
+  const userId = Number(getCookie("id"));
+  const isDono = userId === anuncio?.usuario_id;
+
+  const iniciarConversa = async () => {
+    const token = getTokenFromCookies();
+    setAuthHeader(token);
+
+    try {
+      const res = await api.post("/api/chat/conversas", {
+        anuncioId: anuncio?.id,
+        interessadoId: userId,
+      });
+
+      const conversa = res.data;
+      router.push(`/chat?conversa=${conversa.id}`);
+    } catch (err) {
+      console.error("Erro ao iniciar conversa:", err);
+    }
+  };
+
   const categorias = [
     { id: 1, nome: "Artísticos", icon: "🎨" },
     { id: 2, nome: "Aventura", icon: "🏔️" },
@@ -30,7 +58,7 @@ export default function AnuncioPage() {
     { id: 13, nome: "Tabuleiros", icon: "🎲" },
     { id: 14, nome: "Videogames", icon: "🎮" },
   ];
-  
+
   const categoria_id = categorias.find((c) => c.id === anuncio?.categoria_id);
 
   const getCondicaoColor = (condicao: string) => {
@@ -53,12 +81,9 @@ export default function AnuncioPage() {
   };
 
   if (!id) return <div className="p-8 text-center">Carregando...</div>;
-  if (isPending)
-    return <div className="p-8 text-center">Carregando anúncio...</div>;
-  if (isError)
-    return <div className="p-8 text-center">Erro: {error?.message}</div>;
-  if (!anuncio)
-    return <div className="p-8 text-center">Anúncio não encontrado.</div>;
+  if (isPending) return <div className="p-8 text-center">Carregando anúncio...</div>;
+  if (isError) return <div className="p-8 text-center">Erro: {error?.message}</div>;
+  if (!anuncio) return <div className="p-8 text-center">Anúncio não encontrado.</div>;
 
   const imagensNormalizadas = Array.isArray(anuncio.imagens)
     ? anuncio.imagens
@@ -96,7 +121,6 @@ export default function AnuncioPage() {
         </h1>
 
         <div className="grid grid-cols-2 gap-4 mb-4">
-          {/* Marca */}
           <div className="flex-col">
             <p className="font-semibold">Marca </p>
             <span className="text-muted-foreground">
@@ -116,13 +140,6 @@ export default function AnuncioPage() {
             <Badge className={getTipoColor(anuncio.tipo)}>{anuncio.tipo}</Badge>
           </div>
 
-          {/* {anuncio.endereco_completo && (
-          <div className="flex items-center gap-1 text-xs text-muted-foreground mb-4">
-            <MapPin className="h-4 w-4" />
-            <span>{anuncio.endereco_completo}</span>
-          </div>
-        )} */}
-
           {anuncio.categoria_id && (
             <div className="flex-col">
               <p className="font-semibold">Categoria </p>
@@ -133,10 +150,22 @@ export default function AnuncioPage() {
               </span>
             </div>
           )}
-
         </div>
-          <p className="font-semibold">Descrição</p>
-          <p className="text-base text-foreground mb-4">{anuncio.descricao}</p>
+
+        <p className="font-semibold">Descrição</p>
+        <p className="text-base text-foreground mb-4">{anuncio.descricao}</p>
+
+        {/* Botão de conversa */}
+        {!isDono && (
+          <div className="mt-6">
+            <button
+              onClick={iniciarConversa}
+              className="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600 transition"
+            >
+              Conversar com o anunciante
+            </button>
+          </div>
+        )}
       </div>
 
       <div className="fixed bottom-0 w-full flex justify-center">
