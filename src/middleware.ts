@@ -30,13 +30,16 @@ export function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  // Rotas públicas e estáticos
-  if (isPublic(pathname)) {
-    return NextResponse.next();
-  }
-
   // Verifica token no cookie
   const token = request.cookies.get("token")?.value;
+
+  // Se rota pública e usuário autenticado, redireciona para tela-inicial
+  if (isPublic(pathname)) {
+    if (token) {
+      return NextResponse.redirect(new URL("/tela-inicial", request.url));
+    }
+    return NextResponse.next();
+  }
 
   if (!token) {
     // Mantém o comportamento original (redir para "/")

@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { ArrowLeft, X } from "lucide-react";
+import { ChevronLeft, X } from "lucide-react";
 import { useAnuncioMutation } from "@/hooks/useAnuncio";
 import { z } from "zod";
 import Link from "next/link";
@@ -358,7 +358,7 @@ export default function CriarAnuncioForm({ usuario_id }: { usuario_id: number })
         <div className="flex items-center space-x-4">
           {step > 1 && (
             <button type="button" onClick={handleBack}>
-              <ArrowLeft className="w-6 h-6" />
+              <ChevronLeft className="w-6 h-6" />
             </button>
           )}
           <h1 className="text-2xl font-semibold text-zinc-900 dark:text-primary">

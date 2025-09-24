@@ -55,58 +55,54 @@ export default function ImageCarousel({
   }
 
   return (
+    <div
+      className="relative aspect-square overflow-hidden rounded-lg"
+      aria-roledescription="carousel"
+      aria-label={titulo}
+    >
+      {/* Trilho com scroll horizontal e snap por slide */}
       <div
-        className="relative aspect-square overflow-hidden rounded-lg"
-        aria-roledescription="carousel"
-        aria-label={titulo}
-      >
-        {/* Trilho com scroll horizontal e snap por slide */}
-        <div
-          ref={trackRef}
-          onScroll={onScroll}
-          className="flex h-full w-full overflow-x-auto snap-x snap-mandatory scroll-smooth touch-pan-x select-none
+        ref={trackRef}
+        onScroll={onScroll}
+        className="flex h-full w-full overflow-x-auto snap-x snap-mandatory scroll-smooth touch-pan-x select-none
                      [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-          tabIndex={0}
-          onKeyDown={(e) => {
-            if (e.key === "ArrowLeft") goPrev();
-            if (e.key === "ArrowRight") goNext();
-          }}
-        >
-          {ordered.map((img, i) => (
-            <div
+        tabIndex={0}
+      >
+        {ordered.map((img, i) => (
+          <div
+            key={i}
+            className="relative w-full h-full flex-shrink-0 snap-center"
+          >
+            <Image
+              src={img.url_imagem}
+              alt={img.alt || `${titulo} - ${i + 1}/${ordered.length}`}
+              fill
+              className="object-fill"
+              draggable={false}
+              priority={i === 0}
+              objectFit="contain"
+            />
+          </div>
+        ))}
+      </div>
+      {/* Indicadores */}
+      {ordered.length > 1 && (
+        <div className="absolute inset-x-0 bottom-2 flex justify-center gap-2">
+          {ordered.map((_, i) => (
+            <button
               key={i}
-              className="relative w-full h-full flex-shrink-0 snap-center"
-            >
-              <Image
-                src={img.url_imagem}
-                alt={img.alt || `${titulo} - ${i + 1}/${ordered.length}`}
-                fill
-                sizes="(max-width: 640px) 100vw, 400px"
-                className="object-cover"
-                draggable={false}
-                priority={i === 0}
-              />
-            </div>
-          ))}
-        </div>
-        {/* Indicadores */}
-        {ordered.length > 1 && (
-          <div className="absolute inset-x-0 bottom-2 flex justify-center gap-2">
-            {ordered.map((_, i) => (
-              <button
-                key={i}
-                aria-label={`Ir para imagem ${i + 1}`}
-                onClick={() => setIndex(i)}
-                className={` transition
+              aria-label={`Ir para imagem ${i + 1}`}
+              onClick={() => setIndex(i)}
+              className={` transition
                   ${
                     i === index
                       ? "bg-white rounded-2xl h-2.5 w-6"
                       : "bg-white/50 hover:bg-white/80 h-2.5 w-2.5 rounded-full"
                   }`}
-              />
-            ))}
-          </div>
-        )}
-      </div>
+            />
+          ))}
+        </div>
+      )}
+    </div>
   );
 }

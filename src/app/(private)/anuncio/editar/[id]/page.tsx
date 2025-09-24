@@ -4,7 +4,7 @@ import { useParams, useRouter } from "next/navigation";
 import { useAnuncioById } from "@/hooks/useAnuncioById";
 import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, Loader2, Save } from "lucide-react";
+import { ChevronLeft, Loader2, Save } from "lucide-react";
 import Link from "next/link";
 import BottomNav from "@/components/Botoes/Bottom/button-nav";
 import ImageCarousel from "@/components/Anuncios/Anuncio-image";
@@ -166,7 +166,7 @@ export default function AnuncioPage() {
         <header className="flex justify-between px-6">
           <div className="flex items-center space-x-4">
             <button type="button" onClick={() => router.back()}>
-              <ArrowLeft className="w-6 h-6" />
+              <ChevronLeft className="w-6 h-6" />
             </button>
             <h1 className="text-2xl font-semibold text-zinc-900 dark:text-white">
               Voltar

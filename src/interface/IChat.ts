@@ -4,7 +4,7 @@ export interface Conversa {
   anuncio_id: number;
   ultima_mensagem?: string;
   data_ultima_mensagem?: string;
-  unread_count?: number;
+  data_criacao: string;
 }
 
 export interface Mensagem {

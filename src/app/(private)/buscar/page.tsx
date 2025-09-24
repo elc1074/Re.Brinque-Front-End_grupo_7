@@ -3,7 +3,7 @@
 import BottomNav from "@/components/Botoes/Bottom/button-nav";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Search, SlidersHorizontal } from "lucide-react";
+import { ChevronLeft, Search, SlidersHorizontal } from "lucide-react";
 import ListagemAnuncios from "@/components/Anuncios/listagem-anuncios";
 import { useState } from "react";
 import Link from "next/link";
@@ -27,7 +27,7 @@ export default function TelaInicial() {
       <header className="flex justify-between px-4">
         <div className="flex items-center gap-3">
           <Link href="/perfil" aria-label="Voltar">
-            <ArrowLeft className="w-6 h-6" />
+            <ChevronLeft className="w-6 h-6" />
           </Link>
           <h1 className="text-xl font-semibold">Buscar anúncios</h1>
         </div>

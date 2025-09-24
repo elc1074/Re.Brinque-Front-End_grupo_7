@@ -5,7 +5,7 @@ import { Loader2 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, MoreVertical, Pencil, Trash2 } from "lucide-react";
+import { ChevronLeft, MoreVertical, Pencil, Trash2 } from "lucide-react";
 import { useAnuncioUser, Anuncio } from "@/hooks/useAnuncioUser";
 import { useDeleteAnuncio } from "@/hooks/useDeleteAnuncio";
 import { Button } from "@/components/ui/button";
@@ -107,7 +107,7 @@ export default function MeusAnunciosPage() {
       <header className="flex justify-between px-4">
         <div className="flex items-center gap-3">
           <Link href="/perfil" aria-label="Voltar">
-            <ArrowLeft className="w-6 h-6" />
+            <ChevronLeft className="w-6 h-6" />
           </Link>
           <h1 className="text-xl font-semibold">Meus anúncios</h1>
         </div>

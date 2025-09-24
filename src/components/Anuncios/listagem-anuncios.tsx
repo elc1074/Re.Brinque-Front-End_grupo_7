@@ -9,6 +9,7 @@ import Image from "next/image";
 import { ScrollArea } from "../ui/scroll-area";
 import { Skeleton } from "../ui/skeleton";
 
+
 type Props = {
   busca?: string;
   categoriaId?: string;
@@ -96,7 +97,7 @@ export default function ListagemAnuncios({ busca = "", categoriaId = "all", tipo
         Anúncios Recentes
       </h2>
       <ScrollArea>
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 max-h-[70vh] overflow-y-auto pb-30 pr-1">
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 max-h-[70vh] overflow-y-auto pb-30 px-2">
           {lista.map((anuncio) => (
             <Link
               key={`${anuncio.id}`}
@@ -104,7 +105,7 @@ export default function ListagemAnuncios({ busca = "", categoriaId = "all", tipo
               className="hover:shadow-lg transition-shadow cursor-pointer block"
               style={{ textDecoration: "none", color: "inherit" }}
             >
-              <div className="aspect-square overflow-hidden rounded-lg bg-muted">
+              <div className="aspect-square overflow-hidden rounded-2xl bg-muted">
                 {anuncio.imagens && anuncio.imagens.length > 0 ? (
                   (() => {
                     const principal = Array.isArray(anuncio.imagens)

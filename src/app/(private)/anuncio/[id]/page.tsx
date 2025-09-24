@@ -1,10 +1,10 @@
-'use client';
+"use client";
 
 import { useParams, useRouter } from "next/navigation";
 import { useAnuncioById } from "@/hooks/useAnuncioById";
 import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft } from "lucide-react";
+import { ChevronLeft } from "lucide-react";
 import Link from "next/link";
 import BottomNav from "@/components/Botoes/Bottom/button-nav";
 import ImageCarousel from "@/components/Anuncios/Anuncio-image";
@@ -81,9 +81,12 @@ export default function AnuncioPage() {
   };
 
   if (!id) return <div className="p-8 text-center">Carregando...</div>;
-  if (isPending) return <div className="p-8 text-center">Carregando anúncio...</div>;
-  if (isError) return <div className="p-8 text-center">Erro: {error?.message}</div>;
-  if (!anuncio) return <div className="p-8 text-center">Anúncio não encontrado.</div>;
+  if (isPending)
+    return <div className="p-8 text-center">Carregando anúncio...</div>;
+  if (isError)
+    return <div className="p-8 text-center">Erro: {error?.message}</div>;
+  if (!anuncio)
+    return <div className="p-8 text-center">Anúncio não encontrado.</div>;
 
   const imagensNormalizadas = Array.isArray(anuncio.imagens)
     ? anuncio.imagens
@@ -99,7 +102,7 @@ export default function AnuncioPage() {
       <header className="flex justify-between px-6">
         <div className="flex items-center space-x-4">
           <Link href="/tela-inicial">
-            <ArrowLeft className="w-6 h-6" />
+            <ChevronLeft className="w-6 h-6" />
           </Link>
           <h1 className="text-2xl font-semibold text-zinc-900 dark:text-primary">
             Voltar
@@ -160,12 +163,14 @@ export default function AnuncioPage() {
           <div className="mt-6">
             <button
               onClick={iniciarConversa}
-              className="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600 transition"
+              className="w-full bg-primary text-white py-2 rounded-lg"
             >
               Conversar com o anunciante
             </button>
           </div>
         )}
+
+        {isDono && <div className="mt-6 flex justify-center">Você é o dono deste anúncio.</div>}
       </div>
 
       <div className="fixed bottom-0 w-full flex justify-center">

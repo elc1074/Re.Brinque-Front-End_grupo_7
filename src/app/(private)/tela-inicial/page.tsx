@@ -10,6 +10,7 @@ import FiltroSheet from "@/components/Anuncios/FiltroSheet";
 import PWAPrompt from "@/components/PWAPrompt";
 import ConversationList from "@/components/Chat/ConversationList";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 export default function TelaInicial() {
   const router = useRouter();
@@ -36,11 +37,6 @@ export default function TelaInicial() {
     condicao: "all",
   });
 
-  const [mostrarConversas, setMostrarConversas] = useState(false);
-
-  const handleSelectConversa = (id: number) => {
-    router.push(`/chat?conversa=${id}`);
-  };
 
   return (
     <main className="min-h-dvh bg-background flex flex-col pt-6">
@@ -50,19 +46,15 @@ export default function TelaInicial() {
         </h1>
         <div className="flex items-center gap-4">
           <ModeToggle className="text-primary" />
-          <MessageSquareText
-            size={22}
-            className="text-primary cursor-pointer"
-            onClick={() => setMostrarConversas(!mostrarConversas)}
-          />
+          <Link href="/conversas">
+            <MessageSquareText
+              size={22}
+              className="text-primary cursor-pointer"
+            />
+          </Link>
         </div>
       </header>
 
-      {mostrarConversas && userId ? (
-        <div className="px-6 mt-4">
-          <ConversationList userId={userId} onSelect={handleSelectConversa} />
-        </div>
-      ) : (
         <>
           <section className="px-6 mt-4 relative flex items-center gap-2">
             <div className="relative flex-1">
@@ -100,7 +92,6 @@ export default function TelaInicial() {
             />
           </div>
         </>
-      )}
 
       <PWAPrompt />
 
