@@ -64,8 +64,8 @@ export default function ConversationList({ userId, onSelect }: Props) {
             : "";
 
           return (
-            <Card className="p-4 border-2 border-primary">
-              <li key={conv.id} onClick={() => onSelect(conv.id)}>
+            <Card key={conv.id} className="p-4 border-2 border-primary">
+              <li onClick={() => onSelect(conv.id)}>
                 <div className="flex flex-col">
                   <CardTitle className="flex items-center gap-2 mb-1">
                       <UserCircle className="text-primary"/>
