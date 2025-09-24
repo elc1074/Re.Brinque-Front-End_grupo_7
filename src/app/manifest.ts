@@ -4,7 +4,7 @@ export default function manifest(): MetadataRoute.Manifest {
   return {
     name: "Re.Brinque",
     short_name: "Re.Brinque",
-    start_url: "/",
+    start_url: "/tela-inicial",
     lang: "pt-BR",
     description: "Aplicativo de doação e troca de brinquedos",
     display: "standalone",
