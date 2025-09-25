@@ -41,7 +41,7 @@ export default function TelaInicial() {
   return (
     <main className="min-h-dvh bg-background flex flex-col pt-6">
       <header className="flex justify-between px-6">
-        <h1 className="text-2xl font-semibold text-zinc-900 dark:text-primary">
+        <h1 className="text-2xl font-semibold text-primary">
           Olá, {userName}
         </h1>
         <div className="flex items-center gap-4">

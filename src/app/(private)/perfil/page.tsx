@@ -117,7 +117,7 @@ export default function PerfilPage() {
   return (
     <main className="min-h-dvh bg-[#EBEEEC] dark:bg-zinc-800 flex flex-col">
       {/* Top header + avatar */}
-      <h1 className="text-2xl font-semibold text-zinc-900 dark:text-primary pt-4 pl-4 pb-2">
+      <h1 className="text-2xl font-semibold text-primary pt-4 pl-4 pb-2">
         Conta
       </h1>
 

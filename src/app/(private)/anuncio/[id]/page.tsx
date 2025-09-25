@@ -9,6 +9,7 @@ import Link from "next/link";
 import BottomNav from "@/components/Botoes/Bottom/button-nav";
 import ImageCarousel from "@/components/Anuncios/Anuncio-image";
 import { api, getTokenFromCookies, setAuthHeader } from "@/lib/api";
+import Header from "@/components/Headers/header";
 
 export default function AnuncioPage() {
   const { id } = useParams<{ id: string }>();
@@ -98,17 +99,7 @@ export default function AnuncioPage() {
 
   return (
     <div className="min-h-dvh bg-background flex flex-col pt-6">
-      {/* Header */}
-      <header className="flex justify-between px-6">
-        <div className="flex items-center space-x-4">
-          <Link href="/tela-inicial">
-            <ChevronLeft className="w-6 h-6" />
-          </Link>
-          <h1 className="text-2xl font-semibold text-zinc-900 dark:text-primary">
-            Voltar
-          </h1>
-        </div>
-      </header>
+      <Header texto="Voltar"/>
 
       <div className="pt-6 max-w-sm mx-auto w-full pb-44">
         <div className="aspect-square overflow-hidden">

@@ -27,6 +27,7 @@ import {
 import BottomNav from "@/components/Botoes/Bottom/button-nav";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
+import Header from "@/components/Headers/header";
 
 function getCookie(name = "id") {
   const v = `; ${document.cookie}`;
@@ -103,15 +104,7 @@ export default function MeusAnunciosPage() {
 
   return (
     <div className="min-h-dvh bg-background flex flex-col pt-6">
-      {/* Header */}
-      <header className="flex justify-between px-4">
-        <div className="flex items-center gap-3">
-          <Link href="/perfil" aria-label="Voltar">
-            <ChevronLeft className="w-6 h-6" />
-          </Link>
-          <h1 className="text-xl font-semibold">Meus anúncios</h1>
-        </div>
-      </header>
+      <Header texto="Voltar" />
 
       {/* Abas */}
       <div className="px-4 mt-4">
@@ -167,7 +160,7 @@ export default function MeusAnunciosPage() {
                         {/* Menu 3 pontos */}
                         <DropdownMenu
                           open={openMenuId === a.id || openDialogId === a.id}
-                          onOpenChange={open => {
+                          onOpenChange={(open) => {
                             if (open) {
                               setOpenMenuId(a.id);
                             } else {
@@ -208,7 +201,7 @@ export default function MeusAnunciosPage() {
                               <DialogTrigger asChild>
                                 <DropdownMenuItem
                                   className="text-destructive focus:text-destructive"
-                                  onSelect={e => e.preventDefault()}
+                                  onSelect={(e) => e.preventDefault()}
                                   onClick={() => setOpenDialogId(a.id)}
                                 >
                                   <Trash2 className="h-4 w-4 mr-2" /> Excluir
@@ -238,14 +231,19 @@ export default function MeusAnunciosPage() {
                                       try {
                                         await del.mutateAsync(a.id);
                                         setOpenDialogId(null);
-                                        toast.success("Anúncio excluído com sucesso");
+                                        toast.success(
+                                          "Anúncio excluído com sucesso"
+                                        );
                                       } finally {
                                         setPendingDeleteId(null);
                                       }
                                     }}
                                   >
                                     {pendingDeleteId === a.id ? (
-                                      <span className="flex items-center gap-2"><Loader2 className="animate-spin w-4 h-4" /> Excluindo...</span>
+                                      <span className="flex items-center gap-2">
+                                        <Loader2 className="animate-spin w-4 h-4" />{" "}
+                                        Excluindo...
+                                      </span>
                                     ) : (
                                       "Excluir"
                                     )}

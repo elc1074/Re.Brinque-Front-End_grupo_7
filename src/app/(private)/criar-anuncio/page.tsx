@@ -1,4 +1,4 @@
-import CriarAnuncioForm from "@/components/Formularios/Anuncio/criar-anuncio";
+import CriarAnuncioForm from "@/components/Anuncios/Form/criar-anuncio";
 import { cookies } from "next/headers";
 
 

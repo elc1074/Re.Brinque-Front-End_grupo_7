@@ -2,6 +2,7 @@
 
 import BottomNav from "@/components/Botoes/Bottom/button-nav";
 import ConversationList from "@/components/Chat/ConversationList";
+import Header from "@/components/Headers/header";
 import { ChevronLeft } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -28,15 +29,7 @@ export default function ListaConversas() {
 
   return (
     <div className="min-h-dvh bg-background flex flex-col pt-6">
-      {/* Header */}
-      <header className="flex justify-between px-4">
-        <div className="flex items-center gap-3">
-          <Link href="/tela-inicial" aria-label="Voltar">
-            <ChevronLeft className="w-6 h-6" />
-          </Link>
-          <h1 className="text-xl font-semibold">Minhas conversas</h1>
-        </div>
-      </header>
+      <Header texto="Voltar" />
       <div className="px-6">
         {userId ? (
           <ConversationList userId={userId} onSelect={handleSelectConversa} />

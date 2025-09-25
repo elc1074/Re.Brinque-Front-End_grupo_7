@@ -3,11 +3,12 @@
 import BottomNav from "@/components/Botoes/Bottom/button-nav";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, Search, SlidersHorizontal } from "lucide-react";
+import { ChevronLeft, Search } from "lucide-react";
 import ListagemAnuncios from "@/components/Anuncios/listagem-anuncios";
 import { useState } from "react";
 import Link from "next/link";
 import FiltroSheet from "@/components/Anuncios/FiltroSheet";
+import Header from "@/components/Headers/header";
 
 export default function TelaInicial() {
   const [busca, setBusca] = useState("");
@@ -23,15 +24,8 @@ export default function TelaInicial() {
 
   return (
     <div className="min-h-dvh bg-background flex flex-col pt-6">
-      {/* Header */}
-      <header className="flex justify-between px-4">
-        <div className="flex items-center gap-3">
-          <Link href="/perfil" aria-label="Voltar">
-            <ChevronLeft className="w-6 h-6" />
-          </Link>
-          <h1 className="text-xl font-semibold">Buscar anúncios</h1>
-        </div>
-      </header>
+      <Header texto="Buscar anúncios" />
+
       <section className="px-6 mt-4 relative flex items-center gap-2">
         <div className="relative flex-1">
           <Input

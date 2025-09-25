@@ -2,16 +2,12 @@
 
 import { useParams, useRouter } from "next/navigation";
 import { useAnuncioById } from "@/hooks/useAnuncioById";
-import Image from "next/image";
-import { Badge } from "@/components/ui/badge";
-import { ChevronLeft, Loader2, Save } from "lucide-react";
-import Link from "next/link";
+import { Loader2, Save } from "lucide-react";
 import BottomNav from "@/components/Botoes/Bottom/button-nav";
-import ImageCarousel from "@/components/Anuncios/Anuncio-image";
 import { useForm, Controller } from "react-hook-form";
-import { updateAnuncioRequest, useUpdateAnuncio } from "@/hooks/useAnuncio";
+import { useUpdateAnuncio } from "@/hooks/useAnuncio";
 import { criarAnuncioSchema } from "@/schema/criar-anuncio-schema";
-import UploadFotos from "@/components/Formularios/Anuncio/UploadFotos";
+import UploadFotos from "@/components/Anuncios/Form/UploadFotos";
 import { useCloudinaryConfig } from "@/hooks/useCloudinaryConfig";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -28,6 +24,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
 import { Textarea } from "@/components/ui/textarea";
+import Header from "@/components/Headers/header";
 
 export default function AnuncioPage() {
   const { id } = useParams<{ id: string }>();
@@ -57,15 +54,16 @@ export default function AnuncioPage() {
     { id: 13, nome: "Tabuleiros", icon: "🎲" },
     { id: 14, nome: "Videogames", icon: "🎮" },
   ];
+  
   const condicoes = [
     { value: "NOVO", label: "Novo" },
     { value: "USADO", label: "Usado" },
-  ] as const;
+  ];
 
   const tipos = [
     { value: "TROCA", label: "Troca" },
     { value: "DOACAO", label: "Doação" },
-  ] as const;
+  ];
 
   // const statuses = [
   //   { value: "DISPONIVEL", label: "Disponível" },
@@ -84,16 +82,16 @@ export default function AnuncioPage() {
     setValue,
   } = useForm<CriarAnuncioSchemaType>({
     resolver: zodResolver(criarAnuncioSchema),
-    defaultValues: {
-      titulo: anuncio?.titulo ?? "",
-      categoria_id: anuncio?.categoria_id ?? undefined,
-      marca: anuncio?.marca ?? "",
-      condicao: anuncio?.condicao ?? "USADO",
-      descricao: anuncio?.descricao ?? "",
-      tipo: anuncio?.tipo ?? "TROCA",
-      status: anuncio?.status ?? "DISPONIVEL",
-      imagens: [],
-    },
+    // defaultValues: {
+    //   titulo: anuncio?.titulo ?? "",
+    //   categoria_id: anuncio?.categoria_id ?? undefined,
+    //   marca: anuncio?.marca ?? "",
+    //   condicao: anuncio?.condicao ?? "USADO",
+    //   descricao: anuncio?.descricao ?? "",
+    //   tipo: anuncio?.tipo ?? "TROCA",
+    //   status: anuncio?.status ?? "DISPONIVEL",
+    //   imagens: [],
+    // },
   });
 
   useEffect(() => {
@@ -105,26 +103,28 @@ export default function AnuncioPage() {
   }, [imagens, setValue]);
 
   useEffect(() => {
-    if (anuncio) {
-      reset({
-        titulo: anuncio.titulo,
-        categoria_id: anuncio.categoria_id,
-        marca: anuncio.marca ?? "",
-        condicao: anuncio.condicao,
-        descricao: anuncio.descricao,
-        tipo: anuncio.tipo,
-        status: anuncio.status,
-        imagens: [],
-      });
-      setImagens(
-        Array.isArray(anuncio.imagens)
-          ? anuncio.imagens
-              .map((img: any) =>
-                typeof img === "string" ? img : img.url_imagem
-              )
-              .filter((url: any) => typeof url === "string")
-          : []
-      );
+    if (anuncio && anuncio.condicao && anuncio.tipo && anuncio.categoria_id) {
+      setTimeout(() => {
+        reset({
+          titulo: anuncio.titulo,
+          categoria_id: anuncio.categoria_id,
+          marca: anuncio.marca ?? "",
+          condicao: anuncio.condicao,
+          descricao: anuncio.descricao,
+          tipo: anuncio.tipo,
+          status: anuncio.status,
+          imagens: [],
+        });
+        setImagens(
+          Array.isArray(anuncio.imagens)
+            ? anuncio.imagens
+                .map((img: any) =>
+                  typeof img === "string" ? img : img.url_imagem
+                )
+                .filter((url: any) => typeof url === "string")
+            : []
+        );
+      }, 0);
     }
   }, [anuncio, reset]);
 
@@ -162,17 +162,7 @@ export default function AnuncioPage() {
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
       <div className="min-h-dvh bg-background flex flex-col pt-6">
-        {/* Header */}
-        <header className="flex justify-between px-6">
-          <div className="flex items-center space-x-4">
-            <button type="button" onClick={() => router.back()}>
-              <ChevronLeft className="w-6 h-6" />
-            </button>
-            <h1 className="text-2xl font-semibold text-zinc-900 dark:text-white">
-              Voltar
-            </h1>
-          </div>
-        </header>
+        <Header texto="Voltar"/>
 
         <div className="pt-6 max-w-sm mx-auto w-full pb-44">
           {/* UploadFotos para editar imagens */}
@@ -204,6 +194,7 @@ export default function AnuncioPage() {
               </div>
             )}
           </div>
+
           {/* Preview das imagens (opcional) */}
           {/* <div className="aspect-square overflow-hidden">
             <ImageCarousel
@@ -251,7 +242,7 @@ export default function AnuncioPage() {
                 control={control}
                 render={({ field }) => (
                   <Select
-                    value={field.value ?? ""}
+                    value={field.value ?? undefined}
                     onValueChange={field.onChange}
                   >
                     <SelectTrigger
@@ -284,7 +275,7 @@ export default function AnuncioPage() {
                 control={control}
                 render={({ field }) => (
                   <Select
-                    value={field.value ?? ""}
+                    value={field.value ?? undefined}
                     onValueChange={field.onChange}
                   >
                     <SelectTrigger
@@ -325,7 +316,7 @@ export default function AnuncioPage() {
                   control={control}
                   render={({ field }) => (
                     <Select
-                      value={field.value ? String(field.value) : ""}
+                      value={field.value != undefined && field.value !== null ? String(field.value) : undefined}
                       onValueChange={(v) => field.onChange(Number(v))}
                     >
                       <SelectTrigger
