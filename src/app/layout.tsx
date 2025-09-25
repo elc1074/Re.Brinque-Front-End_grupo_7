@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/ui/theme-provider";
@@ -23,6 +24,26 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  useEffect(() => {
+    if (process.env.NODE_ENV !== "production") {
+      return;
+    }
+
+    if (!("serviceWorker" in navigator)) {
+      return;
+    }
+
+    const registerServiceWorker = async () => {
+      try {
+        await navigator.serviceWorker.register("/service-worker.js");
+      } catch (_error) {
+        return;
+      }
+    };
+
+    registerServiceWorker();
+  }, []);
+
   return (
     <html lang="pt-BR" suppressHydrationWarning>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>

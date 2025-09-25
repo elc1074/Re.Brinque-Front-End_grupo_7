@@ -5,15 +5,12 @@ import { Input } from "@/components/ui/input";
 import { ModeToggle } from "@/components/ui/mode-toggle";
 import { MessageSquareText, Search } from "lucide-react";
 import ListagemAnuncios from "@/components/Anuncios/listagem-anuncios";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import FiltroSheet from "@/components/Anuncios/FiltroSheet";
 import PWAPrompt from "@/components/PWAPrompt";
-import ConversationList from "@/components/Chat/ConversationList";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
 
 export default function TelaInicial() {
-  const router = useRouter();
 
   function getCookie(name: string) {
     if (typeof document === "undefined") return undefined;
@@ -23,7 +20,6 @@ export default function TelaInicial() {
   }
 
   const name = getCookie("nome");
-  const userId = Number(getCookie("id"));
   const userName = name ? decodeURIComponent(name) : "";
 
   const [busca, setBusca] = useState("");
