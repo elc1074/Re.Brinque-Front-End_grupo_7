@@ -21,27 +21,31 @@ const geistMono = Geist_Mono({
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   useEffect(() => {
-    if (process.env.NODE_ENV !== "production") {
-      return;
-    }
-
-    if (!("serviceWorker" in navigator)) {
-      return;
-    }
-
-    const registerServiceWorker = async () => {
-      try {
-        await navigator.serviceWorker.register("/service-worker.js");
-      } catch (_error) {
-        return;
+    if (process.env.NODE_ENV === "production") {
+      // Registrar o service worker
+      if ("serviceWorker" in navigator) {
+        navigator.serviceWorker
+          .register("/service-worker.js")
+          .catch(() => {});
       }
-    };
 
-    registerServiceWorker();
+      // Script do Microsoft Clarity com rest parameters
+      const clarityScript = document.createElement("script");
+      clarityScript.type = "text/javascript";
+      clarityScript.async = true;
+      clarityScript.text = `
+        (function(c,l,a,r,i,t,y){
+          c[a]=c[a]||function(...args){(c[a].q=c[a].q||[]).push(args)};
+          t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+          y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+        })(window, document, "clarity", "script", "tlnr9h46r7");
+      `;
+      document.head.appendChild(clarityScript);
+    }
   }, []);
 
   return (
