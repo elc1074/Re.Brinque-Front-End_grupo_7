@@ -5,6 +5,7 @@ export interface Conversa {
   ultima_mensagem?: string;
   data_ultima_mensagem?: string;
   data_criacao: string;
+  nome_anunciante: string;
 }
 
 export interface Mensagem {

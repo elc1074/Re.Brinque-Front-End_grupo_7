@@ -33,18 +33,18 @@ export default function RootLayout({
           .catch(() => {});
       }
 
-      // Script do Microsoft Clarity com rest parameters
-      const clarityScript = document.createElement("script");
-      clarityScript.type = "text/javascript";
-      clarityScript.async = true;
-      clarityScript.text = `
-        (function(c,l,a,r,i,t,y){
-          c[a]=c[a]||function(...args){(c[a].q=c[a].q||[]).push(args)};
-          t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
-          y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
-        })(window, document, "clarity", "script", "tlnr9h46r7");
-      `;
-      document.head.appendChild(clarityScript);
+      // // Script do Microsoft Clarity com rest parameters
+      // const clarityScript = document.createElement("script");
+      // clarityScript.type = "text/javascript";
+      // clarityScript.async = true;
+      // clarityScript.text = `
+      //   (function(c,l,a,r,i,t,y){
+      //     c[a]=c[a]||function(...args){(c[a].q=c[a].q||[]).push(args)};
+      //     t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+      //     y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+      //   })(window, document, "clarity", "script", "tlnr9h46r7");
+      // `;
+      // document.head.appendChild(clarityScript);
     }
   }, []);
 
@@ -56,7 +56,6 @@ export default function RootLayout({
             attribute="class"
             defaultTheme="system"
             enableSystem
-            disableTransitionOnChange
           >
             {children}
             <Toaster richColors position="top-center" />

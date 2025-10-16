@@ -99,7 +99,7 @@ export default function AnuncioPage() {
 
   return (
     <div className="min-h-dvh bg-background flex flex-col pt-6">
-      <Header texto="Voltar"/>
+      <Header texto="Voltar" />
 
       <div className="pt-6 max-w-sm mx-auto w-full pb-44">
         <div className="aspect-square overflow-hidden">
@@ -110,9 +110,24 @@ export default function AnuncioPage() {
         </div>
 
         {/* Titulo */}
-        <h1 className="pt-4 pb-2 text-2xl font-bold mb-2 text-foreground">
-          {anuncio.titulo}
-        </h1>
+        <div className="pt-4 pb-2">
+          <h1 className="text-2xl font-bold mb-2 text-foreground">
+            {anuncio.titulo}
+          </h1>
+          {!isDono && (
+            <h3>
+              <span className="font-semibold">Anunciado por: </span>
+              {anuncio.nome_usuario || "Usuário desconhecido"}
+            </h3>
+          )}
+
+          {isDono && (
+            <h3>
+              <span className="font-semibold">Anunciado por: </span>
+              Este anuncio foi criado por você
+            </h3>
+          )}
+        </div>
 
         <div className="grid grid-cols-2 gap-4 mb-4">
           <div className="flex-col">
@@ -160,8 +175,6 @@ export default function AnuncioPage() {
             </button>
           </div>
         )}
-
-        {isDono && <div className="mt-6 flex justify-center">Você é o dono deste anúncio.</div>}
       </div>
 
       <div className="fixed bottom-0 w-full flex justify-center">
