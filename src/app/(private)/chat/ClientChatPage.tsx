@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 export default function ClientChatPage() {
   const searchParams = useSearchParams();
   const conversaId = Number(searchParams.get("conversa"));
+  const nomeContato = searchParams.get("nome") || "Usuário";
 
   const [userId, setUserId] = useState<number | null>(null);
 
@@ -25,5 +26,5 @@ export default function ClientChatPage() {
     );
   }
 
-  return <ChatRoom conversationId={conversaId} userId={userId} />;
+  return <ChatRoom conversationId={conversaId} userId={userId} nomeContato={nomeContato} />;
 }

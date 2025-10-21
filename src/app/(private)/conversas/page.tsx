@@ -3,8 +3,6 @@
 import BottomNav from "@/components/Botoes/Bottom/button-nav";
 import ConversationList from "@/components/Chat/ConversationList";
 import Header from "@/components/Headers/header";
-import { ChevronLeft } from "lucide-react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
@@ -23,8 +21,8 @@ export default function ListaConversas() {
     setUserId(id ? Number(id) : null);
   }, []);
 
-  const handleSelectConversa = (id: number) => {
-    router.push(`/chat?conversa=${id}`);
+  const handleSelectConversa = (id: number, nomeContato: string) => {
+    router.push(`/chat?conversa=${id}&nome=${encodeURIComponent(nomeContato)}`);
   };
 
   return (

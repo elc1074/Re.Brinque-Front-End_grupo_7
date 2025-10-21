@@ -7,13 +7,14 @@ import { UserCircle } from "lucide-react";
 
 interface Props {
   userId: number;
-  onSelect: (conversationId: number) => void;
+  onSelect: (conversationId: number, nomeContato: string) => void;
 }
 
 export default function ConversationList({ userId, onSelect }: Props) {
   const [conversas, setConversas] = useState<Conversa[]>([]);
   const [loading, setLoading] = useState(true);
-
+  const isDono = conversas.some((c) => c.anunciante_id === userId);
+  
   useEffect(() => {
     const token = getTokenFromCookies();
     setAuthHeader(token);
@@ -31,6 +32,7 @@ export default function ConversationList({ userId, onSelect }: Props) {
 
     fetchConversas();
   }, [userId]);
+
 
   if (loading) {
     return (
@@ -65,11 +67,14 @@ export default function ConversationList({ userId, onSelect }: Props) {
 
           return (
             <Card key={conv.id} className="p-4 border-2 border-primary">
-              <li onClick={() => onSelect(conv.id)}>
+              <li onClick={() => onSelect(conv.id, isDono ? conv.nome_interessado : conv.nome_anunciante)}>
                 <div className="flex flex-col">
                   <CardTitle className="flex items-center gap-2 mb-1">
-                      <UserCircle className="text-primary"/>
-                    {conv.anuncio_titulo}
+                    <UserCircle className="text-primary" />
+                    {isDono && <span>{conv.nome_interessado}</span>}
+                    {!isDono && <span>{conv.nome_anunciante}</span>}
+                    <span>-</span>
+                    <span>{conv.anuncio_titulo}</span>
                   </CardTitle>
                   {/* <p className="text-sm text-muted-foreground truncate max-w-xs">
                     {conv.ultima_mensagem || "Sem mensagens ainda."}

@@ -12,9 +12,10 @@ import { useRouter } from "next/navigation";
 interface Props {
   conversationId: number;
   userId: number;
+  nomeContato: string;
 }
 
-export default function ChatRoom({ conversationId, userId }: Props) {
+export default function ChatRoom({ conversationId, userId, nomeContato }: Props) {
   const [mensagens, setMensagens] = useState<Mensagem[]>([]);
   const [input, setInput] = useState("");
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -70,7 +71,9 @@ export default function ChatRoom({ conversationId, userId }: Props) {
           <Link href="#" onClick={() => router.back()} aria-label="Voltar">
             <ChevronLeft className="w-6 h-6" />
           </Link>
-          <h1 className="text-xl font-semibold">Chat com usuário</h1>{" "}
+          <h1 className="text-xl font-semibold">
+            Chat com {nomeContato}
+          </h1>
           {/* Adiconar um msg.remente_nome quando tiver no back */}
         </div>
       </header>

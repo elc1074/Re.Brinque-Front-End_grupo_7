@@ -2,10 +2,7 @@
 
 import { useParams, useRouter } from "next/navigation";
 import { useAnuncioById } from "@/hooks/useAnuncioById";
-import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
-import { ChevronLeft } from "lucide-react";
-import Link from "next/link";
 import BottomNav from "@/components/Botoes/Bottom/button-nav";
 import ImageCarousel from "@/components/Anuncios/Anuncio-image";
 import { api, getTokenFromCookies, setAuthHeader } from "@/lib/api";
@@ -110,7 +107,7 @@ export default function AnuncioPage() {
         </div>
 
         {/* Titulo */}
-        <div className="pt-4 pb-2">
+        <div className="pt-4 pb-2 px-2">
           <h1 className="text-2xl font-bold mb-2 text-foreground">
             {anuncio.titulo}
           </h1>
@@ -129,7 +126,7 @@ export default function AnuncioPage() {
           )}
         </div>
 
-        <div className="grid grid-cols-2 gap-4 mb-4">
+        <div className="grid grid-cols-2 gap-4 mb-4 px-2">
           <div className="flex-col">
             <p className="font-semibold">Marca </p>
             <span className="text-muted-foreground">
@@ -161,17 +158,19 @@ export default function AnuncioPage() {
           )}
         </div>
 
-        <p className="font-semibold">Descrição</p>
-        <p className="text-base text-foreground mb-4">{anuncio.descricao}</p>
+        <div className="px-2">
+          <p className="font-semibold">Descrição</p>
+          <p className="text-base text-foreground mb-4">{anuncio.descricao}</p>
+        </div>
 
         {/* Botão de conversa */}
         {!isDono && (
-          <div className="mt-6">
+          <div className="mt-6 px-2">
             <button
               onClick={iniciarConversa}
               className="w-full bg-primary text-white py-2 rounded-lg"
             >
-              Conversar com o anunciante
+              Conversar com {anuncio.nome_usuario}
             </button>
           </div>
         )}
