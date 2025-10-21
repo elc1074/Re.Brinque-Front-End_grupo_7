@@ -13,7 +13,6 @@ interface Props {
 export default function ConversationList({ userId, onSelect }: Props) {
   const [conversas, setConversas] = useState<Conversa[]>([]);
   const [loading, setLoading] = useState(true);
-  const isDono = conversas.some((c) => c.anunciante_id === userId);
   
   useEffect(() => {
     const token = getTokenFromCookies();
@@ -65,14 +64,18 @@ export default function ConversationList({ userId, onSelect }: Props) {
               })
             : "";
 
+          // Determina se o usuário é o dono do anúncio desta conversa específica
+          const isDonoConv = conv.anunciante_id === userId;
+          // Define o nome do contato (quem vai conversar com o usuário)
+          const nomeContato = isDonoConv ? conv.nome_interessado : conv.nome_anunciante;
+
           return (
             <Card key={conv.id} className="p-4 border-2 border-primary">
-              <li onClick={() => onSelect(conv.id, isDono ? conv.nome_interessado : conv.nome_anunciante)}>
+              <li onClick={() => onSelect(conv.id, nomeContato)}>
                 <div className="flex flex-col">
                   <CardTitle className="flex items-center gap-2 mb-1">
                     <UserCircle className="text-primary" />
-                    {isDono && <span>{conv.nome_interessado}</span>}
-                    {!isDono && <span>{conv.nome_anunciante}</span>}
+                    <span>{nomeContato}</span>
                     <span>-</span>
                     <span>{conv.anuncio_titulo}</span>
                   </CardTitle>

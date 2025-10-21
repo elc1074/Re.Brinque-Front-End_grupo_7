@@ -98,8 +98,8 @@ export default function ChatRoom({ conversationId, userId, nomeContato }: Props)
                     <p className="whitespace-pre-wrap">{msg.conteudo}</p>
                     <p className="gap-2 flex justify-end">
                       <span className="text-xs text-white">
-                        {isUser ? "Você" : "Sem nome de usuário"}{" "}
-                        {/* Adiconar um msg.remente_nome quando tiver no back */}
+                        {isUser ? "Você" : nomeContato }
+                       
                       </span>
                       <span className="text-xs text-white">
                         {formatarHora(msg.data_envio)}

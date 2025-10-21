@@ -102,7 +102,7 @@ export default function ListagemAnuncios({ busca = "", categoriaId = "all", tipo
             <Link
               key={`${anuncio.id}`}
               href={`/anuncio/${anuncio.id}`}
-              className="hover:shadow-lg transition-shadow cursor-pointer block"
+              className="hover:shadow-xl hover:scale-105 transition-shadow cursor-pointer block"
               style={{ textDecoration: "none", color: "inherit" }}
             >
               <div className="aspect-square overflow-hidden rounded-2xl bg-muted">

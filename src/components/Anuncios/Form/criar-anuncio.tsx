@@ -12,12 +12,10 @@ import { ChevronLeft, X } from "lucide-react";
 import { useAnuncioMutation } from "@/hooks/useAnuncio";
 import { z } from "zod";
 import Link from "next/link";
-import {
-  criarAnuncioSchema,
-} from "@/schema/criar-anuncio-schema";
+import { criarAnuncioSchema } from "@/schema/criar-anuncio-schema";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
-import UploadFotos from "./UploadFotos";
+import PreviewFotos from "./preview-image";
 import { useCloudinaryConfig } from "@/hooks/useCloudinaryConfig";
 
 const categorias = [
@@ -37,25 +35,30 @@ const categorias = [
   { id: 14, nome: "Videogames", icon: "🎮" },
 ];
 
-type CriarAnuncioSchemaType = z.infer<typeof criarAnuncioSchema>;
+// Modificar o schema para aceitar arquivos locais no frontend
+type CriarAnuncioFormType = Omit<
+  z.infer<typeof criarAnuncioSchema>,
+  "imagens"
+>;
 
-export default function CriarAnuncioForm({ usuario_id }: { usuario_id: number }) {
+export default function CriarAnuncioForm({
+  usuario_id,
+}: {
+  usuario_id: number;
+}) {
   const [step, setStep] = useState(1);
+  const [arquivos, setArquivos] = useState<File[]>([]);
   const router = useRouter();
-  const {
-    config,
-    loading: loadingCloud,
-    error: cloudErr,
-  } = useCloudinaryConfig();
-  
+  const { config } = useCloudinaryConfig();
+
   const {
     register,
     handleSubmit,
     setValue,
     watch,
     formState: { errors },
-  } = useForm<CriarAnuncioSchemaType>({
-    resolver: zodResolver(criarAnuncioSchema),
+  } = useForm<CriarAnuncioFormType>({
+    resolver: zodResolver(criarAnuncioSchema.omit({ imagens: true })),
     defaultValues: {
       categoria_id: null,
       titulo: "",
@@ -63,10 +66,44 @@ export default function CriarAnuncioForm({ usuario_id }: { usuario_id: number })
       condicao: undefined,
       descricao: "",
       status: "DISPONIVEL",
-      imagens: [],
+      tipo: undefined,
     },
   });
+
   const formData = watch();
+
+  // Função para fazer upload das imagens
+  const uploadImagens = async (
+    files: File[]
+  ): Promise<Array<{ url_imagem: string; principal: boolean }>> => {
+    if (!config) throw new Error("Configuração do Cloudinary não disponível");
+
+    const uploads = files.map(async (file, index) => {
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("upload_preset", config.uploadPreset);
+
+      const response = await fetch(
+        `https://api.cloudinary.com/v1_1/${config.cloudName}/image/upload`,
+        {
+          method: "POST",
+          body: formData,
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(`Erro no upload da imagem ${index + 1}`);
+      }
+
+      const data = await response.json();
+      return {
+        url_imagem: data.secure_url,
+        principal: index === 0,
+      };
+    });
+
+    return Promise.all(uploads);
+  };
 
   const handleNext = () => {
     if (step < 7) setStep(step + 1);
@@ -78,74 +115,61 @@ export default function CriarAnuncioForm({ usuario_id }: { usuario_id: number })
 
   const { criarAnuncio, isPending } = useAnuncioMutation();
 
-  async function onSubmit(values: CriarAnuncioSchemaType) {
-    const payload = {
-      ...values,
-      usuario_id,
-      categoria_id: values.categoria_id as number,
-      marca: values.marca !== undefined ? values.marca : null,
-      tipo:
-        values.tipo === "TROCA" || values.tipo === "DOACAO"
-          ? values.tipo
-          : "TROCA",
-    };
+  const onSubmit = async (values: CriarAnuncioFormType): Promise<void> => {
     try {
+      toast.loading("Fazendo upload das imagens...");
+
+      // Upload das imagens
+      const imagens = await uploadImagens(arquivos);
+
+      toast.dismiss();
+      toast.loading("Criando anúncio...");
+
+      const payload = {
+        ...values,
+        usuario_id,
+        categoria_id: values.categoria_id as number,
+        marca: values.marca !== undefined ? values.marca : null,
+        tipo:
+          values.tipo === "TROCA" || values.tipo === "DOACAO"
+            ? values.tipo
+            : "TROCA",
+        imagens,
+      };
+
       const result = await criarAnuncio(payload);
+
+      toast.dismiss();
+
       if (result?.error) {
-        return toast.error(result.error);
+        toast.error(result.error);
+        return;
       }
-        toast.success("Anúncio criado com sucesso!");
-        router.push("/tela-inicial");
+
+      toast.success("Anúncio criado com sucesso!");
+      router.push("/tela-inicial");
     } catch (e: any) {
+      toast.dismiss();
       console.error("Erro ao criar anúncio:", e);
-      toast.error(e.message);
+      toast.error(e.message || "Erro ao criar anúncio");
     }
-  }
-  
+  };
+
   const renderStep = () => {
     switch (step) {
       case 1:
         return (
           <div className="space-y-2">
             <Label className="text-lg font-medium">Fotos do produto</Label>
-            {cloudErr && (
+            <PreviewFotos value={arquivos} onChange={setArquivos} max={6} />
+            {arquivos.length === 0 && (
               <span className="text-red-500 text-sm">
-                Erro ao carregar config do Cloudinary: {cloudErr}
-              </span>
-            )}
-
-            {loadingCloud ? (
-              <div className="text-sm text-muted-foreground">
-                Carregando configurações…
-              </div>
-            ) : config ? (
-              <UploadFotos
-                cloudName={config.cloudName}
-                value={formData.imagens.map((img) => img.url_imagem)}
-                uploadPreset={config.uploadPreset}
-                apiKey={config.apiKey}
-                onChange={(urls) => {
-                  const imagens = urls.map((url, idx) => ({
-                    url_imagem: url,
-                    principal: idx === 0,
-                  }));
-                  setValue("imagens", imagens, { shouldValidate: true });
-                }}
-                max={6}
-              />
-            ) : (
-              <div className="text-sm text-red-500">
-                Não foi possível obter as configurações do Cloudinary.
-              </div>
-            )}
-
-            {errors.imagens && (
-              <span className="text-red-500 text-sm">
-                {errors.imagens.message as string}
+                Adicione pelo menos uma foto do produto
               </span>
             )}
           </div>
         );
+      // ...existing code... (cases 2-7 permanecem iguais)
       case 2:
         return (
           <div className="space-y-6">
@@ -330,7 +354,7 @@ export default function CriarAnuncioForm({ usuario_id }: { usuario_id: number })
   const canProceed = () => {
     switch (step) {
       case 1:
-        return formData.imagens.length > 0;
+        return arquivos.length > 0;
       case 2:
         return formData.titulo.trim().length > 0;
       case 3:
