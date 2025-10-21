@@ -34,7 +34,9 @@ export default function AnuncioPage() {
       });
 
       const conversa = res.data;
-      router.push(`/chat?conversa=${conversa.id}`);
+      // Passa o nome do anunciante como parâmetro na URL
+      const nomeAnunciante = anuncio?.nome_usuario || "Usuário";
+      router.push(`/chat?conversa=${conversa.id}&nome=${encodeURIComponent(nomeAnunciante)}`);
     } catch (err) {
       console.error("Erro ao iniciar conversa:", err);
     }
