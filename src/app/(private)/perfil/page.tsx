@@ -155,8 +155,8 @@ export default function PerfilPage() {
                 label="Meus anúncios"
               />
             </Link>
-            <Row icon={<Heart className="size-5" />} label="Favoritos" />
-            <Row icon={<Bell className="size-5" />} label="Notificações" />
+            {/* <Row icon={<Heart className="size-5" />} label="Favoritos" />
+            <Row icon={<Bell className="size-5" />} label="Notificações" /> */}
           </div>
         </div>
 
@@ -165,7 +165,7 @@ export default function PerfilPage() {
             Preferências
           </h2>
           <div className="bg-card rounded-2xl p-2">
-            <Row
+            {/* <Row
               icon={<Accessibility className="size-5" />}
               label="Acessibilidade"
             />
@@ -177,7 +177,7 @@ export default function PerfilPage() {
                   Português
                 </span>
               }
-            />
+            /> */}
             <Row
               icon={<Moon className="size-5" />}
               label="Modo escuro"
@@ -191,7 +191,7 @@ export default function PerfilPage() {
           </div>
         </div>
 
-        <div>
+        {/* <div>
           <h2 className="text-[15px] font-semibold text-zinc-800 dark:text-zinc-100 mb-1">
             Privacidade e segurança
           </h2>
@@ -207,9 +207,9 @@ export default function PerfilPage() {
               label="Configurar notificações"
             />
           </div>
-        </div>
+        </div> */}
 
-        <div>
+        {/* <div>
           <h2 className="text-[15px] font-semibold text-zinc-800 dark:text-zinc-100 mb-1">
             Ajuda
           </h2>
@@ -220,7 +220,7 @@ export default function PerfilPage() {
             />
             <Row icon={<FileText className="size-5" />} label="Termos de uso" />
           </div>
-        </div>
+        </div> */}
 
         <div className="pt-2">
           <Button

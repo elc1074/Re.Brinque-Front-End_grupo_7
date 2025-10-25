@@ -8,6 +8,7 @@ import { useRouter } from "next/navigation";
 import { ChevronLeft, MoreVertical, Pencil, Trash2 } from "lucide-react";
 import { useAnuncioUser, Anuncio } from "@/hooks/useAnuncioUser";
 import { useDeleteAnuncio } from "@/hooks/useDeleteAnuncio";
+import { useUpdateStatus } from "@/hooks/useAnuncio";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -16,6 +17,7 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 import {
   Dialog,
   DialogTrigger,
@@ -83,8 +85,11 @@ export default function MeusAnunciosPage() {
     isPending,
     isError,
     error,
+    refetch,
   } = useAnuncioUser(userId);
   const del = useDeleteAnuncio();
+  const updateStatus = useUpdateStatus();
+  const [pendingStatusId, setPendingStatusId] = useState<string | null>(null);
 
   const publicados = useMemo(
     () => anuncios.filter((a) => !isFinalizado(a)),
@@ -191,6 +196,34 @@ export default function MeusAnunciosPage() {
                             >
                               <Pencil className="h-4 w-4 mr-2" /> Editar anúncio
                             </DropdownMenuItem>
+                            <DropdownMenuSeparator />
+                            <div className="px-3 py-2">
+                              <span className="font-semibold block mb-1">Status:</span>
+                              <Select
+                                value={a.status}
+                                disabled={pendingStatusId === a.id}
+                                onValueChange={async (status) => {
+                                  if (status === a.status) return;
+                                  setPendingStatusId(a.id);
+                                  try {
+                                    await updateStatus.mutateAsync({ id: a.id, status });
+                                    toast.success("Status atualizado para " + status);
+                                    refetch();
+                                  } finally {
+                                    setPendingStatusId(null);
+                                  }
+                                }}
+                              >
+                                <SelectTrigger className="w-full">
+                                  <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="DISPONIVEL">Disponível</SelectItem>
+                                  <SelectItem value="NEGOCIANDO">Negociando</SelectItem>
+                                  <SelectItem value="FINALIZADO">Finalizado</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </div>
                             <DropdownMenuSeparator />
                             <Dialog
                               open={openDialogId === a.id}

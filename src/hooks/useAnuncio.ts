@@ -123,3 +123,28 @@ export function useUpdateAnuncio() {
       updateAnuncioRequest(id, data),
   });
 }
+
+export async function UpdateStatus(id: string, status: string) {
+  const token = typeof document !== "undefined"
+    ? document.cookie.match(/token=([^;]+)/)?.[1]
+    : undefined;
+
+  const headers: Record<string, string> = {
+    "Content-Type": "application/json",
+  };
+  if (token) headers.Authorization = `Bearer ${token}`;
+  const res = await fetch(`${URL_API}/api/anuncios/${id}/status`, {
+    method: "PATCH",
+    headers,
+    body: JSON.stringify({ status }),
+  });
+  if (!res.ok) throw new Error(await res.text());
+  return await res.json();
+}
+
+export function useUpdateStatus() {
+  return useMutation({
+    mutationFn: ({ id, status }: { id: string; status: string }) =>
+      UpdateStatus(id, status),
+  });
+}
