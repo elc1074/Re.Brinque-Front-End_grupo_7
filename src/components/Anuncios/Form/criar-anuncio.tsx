@@ -72,13 +72,43 @@ export default function CriarAnuncioForm({
 
   const formData = watch();
 
+  const moderarImagem = async (file: File): Promise<boolean> => {
+    const formData = new FormData();
+    formData.append("imagem", file);
+
+    const response = await fetch("https://back-rebrinque.onrender.com/api/moderar-upload", {
+      method: "POST",
+      body: formData,
+    });
+
+    if (!response.ok) throw new Error("Erro ao analisar imagem");
+
+    const data = await response.json();
+    return !data.bloqueado; // true se aprovada
+  };
+
   // Função para fazer upload das imagens
   const uploadImagens = async (
     files: File[]
-  ): Promise<Array<{ url_imagem: string; principal: boolean }>> => {
-    if (!config) throw new Error("Configuração do Cloudinary não disponível");
+  ): Promise<Array<{ url_imagem: string; principal: boolean }> | null> => {
+    if (!config) {
+      toast.error("Configuração do Cloudinary não disponível");
+      return null;
+    }
 
-    const uploads = files.map(async (file, index) => {
+    const resultados: Array<{ url_imagem: string; principal: boolean }> = [];
+
+    for (let index = 0; index < files.length; index++) {
+      const file = files[index];
+      const aprovada = await moderarImagem(file);
+
+      if (!aprovada) {
+        toast.error(`Imagem ${index + 1} bloqueada por conteúdo impróprio`);
+        await new Promise(resolve => setTimeout(resolve, 1000)); // espera 1 segundo
+        return null;
+      }
+
+
       const formData = new FormData();
       formData.append("file", file);
       formData.append("upload_preset", config.uploadPreset);
@@ -92,18 +122,20 @@ export default function CriarAnuncioForm({
       );
 
       if (!response.ok) {
-        throw new Error(`Erro no upload da imagem ${index + 1}`);
+        toast.error(`Erro no upload da imagem ${index + 1}`);
+        return null;
       }
 
       const data = await response.json();
-      return {
+      resultados.push({
         url_imagem: data.secure_url,
         principal: index === 0,
-      };
-    });
+      });
+    }
 
-    return Promise.all(uploads);
+    return resultados;
   };
+
 
   const handleNext = () => {
     if (step < 7) setStep(step + 1);
@@ -117,12 +149,18 @@ export default function CriarAnuncioForm({
 
   const onSubmit = async (values: CriarAnuncioFormType): Promise<void> => {
     try {
-      toast.loading("Fazendo upload das imagens...");
+      toast.loading("Analisando imagens...");
 
-      // Upload das imagens
       const imagens = await uploadImagens(arquivos);
 
       toast.dismiss();
+
+      if (!imagens || imagens.length === 0) {
+        await new Promise(resolve => setTimeout(resolve, 1000)); // espera o toast aparecer
+        setStep(1); // volta para etapa de upload
+        return;
+      }
+
       toast.loading("Criando anúncio...");
 
       const payload = {
@@ -154,6 +192,7 @@ export default function CriarAnuncioForm({
       toast.error(e.message || "Erro ao criar anúncio");
     }
   };
+
 
   const renderStep = () => {
     switch (step) {
