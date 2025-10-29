@@ -146,6 +146,8 @@ export default function CriarAnuncioForm({
   };
 
   const { criarAnuncio, isPending } = useAnuncioMutation();
+  const storedLocation = localStorage.getItem("userLocation");
+  console.log("Location usada no anúncio:", storedLocation);
 
   const onSubmit = async (values: CriarAnuncioFormType): Promise<void> => {
     try {
@@ -163,6 +165,21 @@ export default function CriarAnuncioForm({
 
       toast.loading("Criando anúncio...");
 
+       let location = { latitude: 0, longitude: 0 };
+       if (typeof window !== "undefined") {
+         const storedLocation = localStorage.getItem("userLocation");
+         if (storedLocation) {
+           try {
+             const parsedLocation = JSON.parse(storedLocation);
+             if (parsedLocation.latitude && parsedLocation.longitude) {
+               location = parsedLocation;
+             }
+           } catch (e) {
+             console.error("Falha ao analisar userLocation do localStorage", e);
+           }
+         }
+       }
+
       const payload = {
         ...values,
         usuario_id,
@@ -173,6 +190,7 @@ export default function CriarAnuncioForm({
             ? values.tipo
             : "TROCA",
         imagens,
+        location,
       };
 
       const result = await criarAnuncio(payload);

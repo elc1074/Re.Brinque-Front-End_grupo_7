@@ -35,8 +35,8 @@ export default function UploadFotos({
       const uploaded: string[] = [];
       for (const file of filesArr) {
         if (!file.type.startsWith("image/")) continue;
-        if (file.size > 30 * 1024 * 1024) { // 30MB
-          toast.error(`${file.name} arquivo muito grande! Tente outro.`);
+        if (file.size > 10 * 1024 * 1024) { // 10MB
+          toast.error(`${file.name} Arquivo acima de 10MB, envie um menor.`);
           continue;
         }
 

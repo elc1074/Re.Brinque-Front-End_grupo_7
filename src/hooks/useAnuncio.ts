@@ -36,12 +36,34 @@ async function criarAnuncioRequest(data: IAnuncio): Promise<IAnuncioResponse> {
 
 // Função para buscar todos anúncios
 async function getAnunciosRequest(): Promise<IAnuncio[]> {
-  const response = await fetch(`${URL_API}/api/anuncios`);
-  if (response.ok) {
-    return await response.json();
-  } else {
-    const error = await response.text();
-    throw new Error(error);
+  const url = new URL(`${URL_API}/api/anuncios`);
+
+  if (typeof window !== "undefined") {
+    const storedLocation = localStorage.getItem("userLocation");
+    if (storedLocation) {
+      try {
+        const { latitude, longitude } = JSON.parse(storedLocation);
+        if (latitude && longitude) {
+          url.searchParams.append("latitude", latitude.toString());
+          url.searchParams.append("longitude", longitude.toString());
+        }
+      } catch (e) {
+        console.error("Falha ao analisar userLocation do localStorage", e);
+      }
+    }
+  }
+
+  try {
+    const response = await fetch(url.toString());
+    if (response.ok) {
+      return await response.json();
+    } else {
+      const error = await response.text();
+      throw new Error(error);
+    }
+  } catch (error) {
+    console.error("Erro ao buscar anúncios:", error);
+    return [];
   }
 }
 

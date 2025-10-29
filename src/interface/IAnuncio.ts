@@ -16,6 +16,10 @@ export default interface IAnuncio {
   condicao: "NOVO" | "SEMINOVO" | "USADO";
   status: "DISPONIVEL" | "NEGOCIANDO" | "FINALIZADO";
   imagens?: (string | IImagem)[];
+  location?: {
+    latitude: number;
+    longitude: number;
+  } | null;
 }
 
 export interface IAnuncioResponse {
