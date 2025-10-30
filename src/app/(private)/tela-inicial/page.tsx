@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { ModeToggle } from "@/components/ui/mode-toggle";
 import { MessageSquareText, Search } from "lucide-react";
 import ListagemAnuncios from "@/components/Anuncios/listagem-anuncios";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import FiltroSheet from "@/components/Anuncios/FiltroSheet";
 import PWAPrompt from "@/components/PWAPrompt";
 import Link from "next/link";
@@ -33,6 +33,37 @@ export default function TelaInicial() {
     condicao: "all",
   });
 
+    useEffect(() => {
+      if (typeof window !== "undefined") {
+        // Verifica se a localização já está no localStorage
+        const storedLocation = localStorage.getItem("userLocation");
+
+        if (!storedLocation) {
+          // Se não estiver, pede a localização ao usuário
+          if ("geolocation" in navigator) {
+            navigator.geolocation.getCurrentPosition(
+              (position) => {
+                const { latitude, longitude } = position.coords;
+                const location = { latitude, longitude };
+                // Guarda a localização no localStorage
+                localStorage.setItem("userLocation", JSON.stringify(location));
+                console.log("Localização guardada:", location);
+              },
+              (error) => {
+                console.error("Erro ao obter a localização:", error);
+              }
+            );
+          } else {
+            console.log("Geolocalização não é suportada neste navegador.");
+          }
+        } else {
+          console.log(
+            "Localização já existe no localStorage:",
+            JSON.parse(storedLocation)
+          );
+        }
+      }
+    }, []);
 
   return (
     <main className="min-h-dvh bg-background flex flex-col pt-6">
