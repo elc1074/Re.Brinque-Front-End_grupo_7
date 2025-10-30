@@ -17,7 +17,13 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
-import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+} from "@/components/ui/select";
 import {
   Dialog,
   DialogTrigger,
@@ -190,7 +196,9 @@ export default function MeusAnunciosPage() {
                             </DropdownMenuItem>
                             <DropdownMenuSeparator />
                             <div className="px-3 py-2">
-                              <span className="font-semibold block mb-1">Status:</span>
+                              <span className="font-semibold block mb-1">
+                                Status:
+                              </span>
                               <Select
                                 value={a.status}
                                 disabled={pendingStatusId === a.id}
@@ -198,8 +206,13 @@ export default function MeusAnunciosPage() {
                                   if (status === a.status) return;
                                   setPendingStatusId(a.id);
                                   try {
-                                    await updateStatus.mutateAsync({ id: a.id, status });
-                                    toast.success("Status atualizado para " + status);
+                                    await updateStatus.mutateAsync({
+                                      id: a.id,
+                                      status,
+                                    });
+                                    toast.success(
+                                      "Status atualizado para " + status
+                                    );
                                     refetch();
                                   } finally {
                                     setPendingStatusId(null);
@@ -210,9 +223,15 @@ export default function MeusAnunciosPage() {
                                   <SelectValue />
                                 </SelectTrigger>
                                 <SelectContent>
-                                  <SelectItem value="DISPONIVEL">Disponível</SelectItem>
-                                  <SelectItem value="NEGOCIANDO">Negociando</SelectItem>
-                                  <SelectItem value="FINALIZADO">Finalizado</SelectItem>
+                                  <SelectItem value="DISPONIVEL">
+                                    Disponível
+                                  </SelectItem>
+                                  <SelectItem value="NEGOCIANDO">
+                                    Negociando
+                                  </SelectItem>
+                                  <SelectItem value="FINALIZADO">
+                                    Finalizado
+                                  </SelectItem>
                                 </SelectContent>
                               </Select>
                             </div>
@@ -316,7 +335,7 @@ export default function MeusAnunciosPage() {
                             </p>
                           </Link>
                           <p className="text-xs text-muted-foreground mt-1">
-                            {formatPreco(a)} • Publicado {publicado}
+                            • Publicado em {publicado}
                           </p>
                         </div>
                         {/* Menu 3 pontos */}
