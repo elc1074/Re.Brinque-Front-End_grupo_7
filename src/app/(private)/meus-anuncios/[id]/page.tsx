@@ -58,14 +58,6 @@ function getPublicacao(anuncio: Anuncio) {
   return anuncio.data_publicacao || anuncio.created_at || "";
 }
 
-function formatPreco(a: Anuncio) {
-  if (a.tipo === "DOACAO" || !a.preco || a.preco === 0) return "Doação";
-  return a.preco.toLocaleString("pt-BR", {
-    style: "currency",
-    currency: "BRL",
-  });
-}
-
 function getThumb(a: Anuncio) {
   const principal = a.imagens?.find((i) => i.principal);
   return (principal?.url_imagem || a.imagens?.[0]?.url_imagem || "") as string;
@@ -159,7 +151,7 @@ export default function MeusAnunciosPage() {
                             </p>
                           </Link>
                           <p className="text-xs text-muted-foreground mt-1">
-                            {formatPreco(a)} • Publicado {publicado}
+                            • Publicado em {publicado}
                           </p>
                         </div>
                         {/* Menu 3 pontos */}
