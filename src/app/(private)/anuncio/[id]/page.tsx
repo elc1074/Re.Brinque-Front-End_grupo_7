@@ -131,7 +131,7 @@ export default function AnuncioPage() {
 
   return (
     <div className="min-h-dvh bg-gradient-to-b from-background via-background to-primary/5 flex flex-col pt-6">
-      <Header texto="Voltar" />
+      <Header texto={anuncio.titulo} />
 
       <div className="pt-6 max-w-sm mx-auto w-full pb-44 px-4">
         <div className="aspect-square overflow-hidden rounded-2xl shadow-lg border border-border/50 mb-6">
