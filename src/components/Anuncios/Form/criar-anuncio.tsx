@@ -10,7 +10,7 @@ import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { ChevronLeft, X } from "lucide-react";
 import { useAnuncioMutation } from "@/hooks/useAnuncio";
-import { z } from "zod";
+import type { z } from "zod";
 import Link from "next/link";
 import { criarAnuncioSchema } from "@/schema/criar-anuncio-schema";
 import { toast } from "sonner";
@@ -36,10 +36,7 @@ const categorias = [
 ];
 
 // Modificar o schema para aceitar arquivos locais no frontend
-type CriarAnuncioFormType = Omit<
-  z.infer<typeof criarAnuncioSchema>,
-  "imagens"
->;
+type CriarAnuncioFormType = Omit<z.infer<typeof criarAnuncioSchema>, "imagens">;
 
 export default function CriarAnuncioForm({
   usuario_id,
@@ -76,10 +73,13 @@ export default function CriarAnuncioForm({
     const formData = new FormData();
     formData.append("imagem", file);
 
-    const response = await fetch("https://back-rebrinque.onrender.com/api/moderar-upload", {
-      method: "POST",
-      body: formData,
-    });
+    const response = await fetch(
+      "https://back-rebrinque.onrender.com/api/moderar-upload",
+      {
+        method: "POST",
+        body: formData,
+      }
+    );
 
     if (!response.ok) throw new Error("Erro ao analisar imagem");
 
@@ -104,10 +104,9 @@ export default function CriarAnuncioForm({
 
       if (!aprovada) {
         toast.error(`Imagem ${index + 1} bloqueada por conteúdo impróprio`);
-        await new Promise(resolve => setTimeout(resolve, 1000)); // espera 1 segundo
+        await new Promise((resolve) => setTimeout(resolve, 1000)); // espera 1 segundo
         return null;
       }
-
 
       const formData = new FormData();
       formData.append("file", file);
@@ -136,7 +135,6 @@ export default function CriarAnuncioForm({
     return resultados;
   };
 
-
   const handleNext = () => {
     if (step < 7) setStep(step + 1);
   };
@@ -158,27 +156,27 @@ export default function CriarAnuncioForm({
       toast.dismiss();
 
       if (!imagens || imagens.length === 0) {
-        await new Promise(resolve => setTimeout(resolve, 1000)); // espera o toast aparecer
+        await new Promise((resolve) => setTimeout(resolve, 1000)); // espera o toast aparecer
         setStep(1); // volta para etapa de upload
         return;
       }
 
       toast.loading("Criando anúncio...");
 
-       let location = { latitude: 0, longitude: 0 };
-       if (typeof window !== "undefined") {
-         const storedLocation = localStorage.getItem("userLocation");
-         if (storedLocation) {
-           try {
-             const parsedLocation = JSON.parse(storedLocation);
-             if (parsedLocation.latitude && parsedLocation.longitude) {
-               location = parsedLocation;
-             }
-           } catch (e) {
-             console.error("Falha ao analisar userLocation do localStorage", e);
-           }
-         }
-       }
+      let location = { latitude: 0, longitude: 0 };
+      if (typeof window !== "undefined") {
+        const storedLocation = localStorage.getItem("userLocation");
+        if (storedLocation) {
+          try {
+            const parsedLocation = JSON.parse(storedLocation);
+            if (parsedLocation.latitude && parsedLocation.longitude) {
+              location = parsedLocation;
+            }
+          } catch (e) {
+            console.error("Falha ao analisar userLocation do localStorage", e);
+          }
+        }
+      }
 
       const payload = {
         ...values,
@@ -210,7 +208,6 @@ export default function CriarAnuncioForm({
       toast.error(e.message || "Erro ao criar anúncio");
     }
   };
-
 
   const renderStep = () => {
     switch (step) {

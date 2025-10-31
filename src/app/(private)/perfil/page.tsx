@@ -1,19 +1,13 @@
 "use client";
 
+import type React from "react";
+
 import BottomNav from "@/components/Botoes/Bottom/button-nav";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
-  Accessibility,
-  Bell,
   Camera,
   ChevronRight,
-  FileText,
-  CircleHelp,
-  Fingerprint,
-  Globe,
-  Heart,
-  Lock,
   LogOut,
   Moon,
   PencilLine,
@@ -22,7 +16,6 @@ import {
 import { useTheme } from "next-themes";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
 
 function Row({
   icon,
@@ -92,7 +85,6 @@ function getCookie(name: string) {
   if (parts.length === 2) return parts.pop()?.split(";").shift();
 }
 
-
 const name = getCookie("nome");
 const id = getCookie("id");
 const userName = name ? decodeURIComponent(name) : "";
@@ -102,7 +94,6 @@ export default function PerfilPage() {
   const router = useRouter();
   const { theme, setTheme } = useTheme();
   const darkEnabled = theme === "dark";
-  const [biometria, setBiometria] = useState(true);
 
   const handleLogout = async () => {
     try {
@@ -115,69 +106,57 @@ export default function PerfilPage() {
   };
 
   return (
-    <main className="min-h-dvh bg-[#EBEEEC] dark:bg-zinc-800 flex flex-col">
-      {/* Top header + avatar */}
-      <h1 className="text-2xl font-semibold text-primary pt-4 pl-4 pb-2">
-        Conta
-      </h1>
+    <main className="min-h-dvh bg-gradient-to-b from-[#EBEEEC] to-background dark:from-zinc-900 dark:to-zinc-800 flex flex-col">
+      <div className="bg-gradient-to-r from-primary/10 to-primary/5 pt-6 pb-4 px-4">
+        <h1 className="text-2xl font-bold text-primary">Minha Conta</h1>
+        <p className="text-sm text-muted-foreground mt-1">
+          Gerencie suas informações e preferências
+        </p>
+      </div>
 
-      <section className="bg-background rounded-t-2xl ">
-        <div className="mt-6 flex flex-col items-center">
-          <div className="relative">
-            <Avatar className="h-20 w-20 text-lg">
-              <AvatarFallback className="bg-zinc-200 text-zinc-700 dark:bg-zinc-700 dark:text-zinc-200">
+      <section className="bg-background rounded-t-3xl shadow-lg -mt-2">
+        <div className="mt-8 flex flex-col items-center">
+          <div className="relative group">
+            <Avatar className="h-24 w-24 text-xl border-4 border-background shadow-xl">
+              <AvatarFallback className="bg-gradient-to-br from-primary/20 to-primary/10 text-primary text-2xl font-bold">
                 {userInitials}
               </AvatarFallback>
             </Avatar>
-            <span className="absolute -bottom-1 -right-1 size-7 rounded-full bg-zinc-200 dark:bg-zinc-700 grid place-content-center border border-white dark:border-zinc-900">
-              <Camera className="size-4 text-zinc-700 dark:text-zinc-100" />
+            <span className="absolute -bottom-1 -right-1 size-8 rounded-full bg-primary grid place-content-center border-2 border-background shadow-lg group-hover:scale-110 transition-transform cursor-pointer">
+              <Camera className="size-4 text-white" />
             </span>
           </div>
-          <div className="mt-3 flex items-center gap-2">
-            <p className="text-base font-medium text-zinc-800 dark:text-zinc-100">
+          <div className="mt-4 flex items-center gap-2">
+            <p className="text-lg font-semibold text-zinc-800 dark:text-zinc-100">
               {userName}
             </p>
-            <PencilLine className="size-4 text-zinc-700 dark:text-zinc-300" />
+            <button className="p-1 hover:bg-muted rounded-full transition-colors">
+              <PencilLine className="size-4 text-zinc-700 dark:text-zinc-300" />
+            </button>
           </div>
         </div>
       </section>
 
-      {/* Content */}
-      <section className=" bg-background px-6 py-4 space-y-6 pb-36">
+      <section className="bg-background px-6 py-6 space-y-6 pb-36">
         <div>
-          <h2 className="text-[15px] font-semibold text-zinc-800 dark:text-zinc-100 mb-1">
+          <h2 className="text-sm font-bold text-zinc-800 dark:text-zinc-100 mb-3 uppercase tracking-wide">
             Meus dados
           </h2>
-          <div className="bg-card rounded-2xl p-2">
+          <div className="bg-card rounded-2xl p-2 shadow-md border border-border/50">
             <Link href={`/meus-anuncios/${id}`}>
               <Row
                 icon={<ShoppingBag className="size-5" />}
                 label="Meus anúncios"
               />
             </Link>
-            {/* <Row icon={<Heart className="size-5" />} label="Favoritos" />
-            <Row icon={<Bell className="size-5" />} label="Notificações" /> */}
           </div>
         </div>
 
         <div>
-          <h2 className="text-[15px] font-semibold text-zinc-800 dark:text-zinc-100 mb-1">
+          <h2 className="text-sm font-bold text-zinc-800 dark:text-zinc-100 mb-3 uppercase tracking-wide">
             Preferências
           </h2>
-          <div className="bg-card rounded-2xl p-2">
-            {/* <Row
-              icon={<Accessibility className="size-5" />}
-              label="Acessibilidade"
-            />
-            <Row
-              icon={<Globe className="size-5" />}
-              label="Idioma"
-              right={
-                <span className="text-sm text-zinc-500 dark:text-zinc-300 mr-1">
-                  Português
-                </span>
-              }
-            /> */}
+          <div className="bg-card rounded-2xl p-2 shadow-md border border-border/50">
             <Row
               icon={<Moon className="size-5" />}
               label="Modo escuro"
@@ -191,44 +170,13 @@ export default function PerfilPage() {
           </div>
         </div>
 
-        {/* <div>
-          <h2 className="text-[15px] font-semibold text-zinc-800 dark:text-zinc-100 mb-1">
-            Privacidade e segurança
-          </h2>
-          <div className="bg-card rounded-2xl p-2">
-            <Row icon={<Lock className="size-5" />} label="Alterar senha" />
-            <Row
-              icon={<Fingerprint className="size-5" />}
-              label="Biometria"
-              right={<Switch checked={biometria} onChange={setBiometria} />}
-            />
-            <Row
-              icon={<Bell className="size-5" />}
-              label="Configurar notificações"
-            />
-          </div>
-        </div> */}
-
-        {/* <div>
-          <h2 className="text-[15px] font-semibold text-zinc-800 dark:text-zinc-100 mb-1">
-            Ajuda
-          </h2>
-          <div className="bg-card rounded-2xl p-2">
-            <Row
-              icon={<CircleHelp className="size-5" />}
-              label="Central de ajuda"
-            />
-            <Row icon={<FileText className="size-5" />} label="Termos de uso" />
-          </div>
-        </div> */}
-
-        <div className="pt-2">
+        <div className="pt-4">
           <Button
             variant="outline"
-            className="w-full h-12 rounded-xl border-primary text-primary hover:bg-primary/5"
+            className="w-full h-12 rounded-xl border-2 border-destructive/50 text-destructive hover:bg-destructive/10 hover:border-destructive font-semibold shadow-sm transition-all duration-300 bg-transparent"
             onClick={handleLogout}
           >
-            <LogOut className="mr-2 size-5" /> Sair
+            <LogOut className="mr-2 size-5" /> Sair da conta
           </Button>
         </div>
       </section>

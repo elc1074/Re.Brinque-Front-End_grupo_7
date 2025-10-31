@@ -11,8 +11,13 @@ import {
 import { Button } from "@/components/ui/button";
 import { SlidersHorizontal } from "lucide-react";
 import { Label } from "@/components/ui/label";
-import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
-import React from "react";
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+} from "@/components/ui/select";
 
 interface FiltroSheetProps {
   open: boolean;
@@ -40,19 +45,28 @@ export default function FiltroSheet({
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetTrigger asChild>
-        <Button variant="link" size="icon" className="ml-2">
-          <SlidersHorizontal className="!size-5" />
+        <Button
+          variant="outline"
+          size="icon"
+          className="ml-2 h-12 w-12 rounded-xl border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 hover:bg-primary/5 hover:border-primary/50 transition-all duration-200 shadow-sm"
+        >
+          <SlidersHorizontal className="!size-5 text-primary" />
         </Button>
       </SheetTrigger>
-      <SheetContent side="right">
-        <SheetHeader>
-          <SheetTitle>Filtrar anúncios</SheetTitle>
+      <SheetContent side="right" className="w-full sm:max-w-md">
+        <SheetHeader className="pb-6 border-b">
+          <SheetTitle className="text-xl font-bold">
+            Filtrar anúncios
+          </SheetTitle>
+          <p className="text-sm text-muted-foreground">Refine sua busca</p>
         </SheetHeader>
-        <div className="space-y-6 mt-6 px-4">
-          <div>
-            <Label>Categoria</Label>
+        <div className="space-y-6 mt-8 px-1">
+          <div className="space-y-3">
+            <Label className="text-sm font-semibold text-foreground">
+              Categoria
+            </Label>
             <Select value={categoriaId} onValueChange={setCategoriaId}>
-              <SelectTrigger className="w-full mt-2">
+              <SelectTrigger className="w-full h-11 rounded-xl border-zinc-200 dark:border-zinc-700">
                 <SelectValue placeholder="Todas" />
               </SelectTrigger>
               <SelectContent>
@@ -74,10 +88,12 @@ export default function FiltroSheet({
               </SelectContent>
             </Select>
           </div>
-          <div>
-            <Label>Tipo</Label>
+          <div className="space-y-3">
+            <Label className="text-sm font-semibold text-foreground">
+              Tipo
+            </Label>
             <Select value={tipo} onValueChange={setTipo}>
-              <SelectTrigger className="w-full mt-1">
+              <SelectTrigger className="w-full h-11 rounded-xl border-zinc-200 dark:border-zinc-700">
                 <SelectValue placeholder="Todos" />
               </SelectTrigger>
               <SelectContent>
@@ -87,10 +103,12 @@ export default function FiltroSheet({
               </SelectContent>
             </Select>
           </div>
-          <div>
-            <Label>Condição</Label>
+          <div className="space-y-3">
+            <Label className="text-sm font-semibold text-foreground">
+              Condição
+            </Label>
             <Select value={condicao} onValueChange={setCondicao}>
-              <SelectTrigger className="w-full mt-1">
+              <SelectTrigger className="w-full h-11 rounded-xl border-zinc-200 dark:border-zinc-700">
                 <SelectValue placeholder="Todas" />
               </SelectTrigger>
               <SelectContent>
@@ -102,9 +120,12 @@ export default function FiltroSheet({
             </Select>
           </div>
         </div>
-        <SheetFooter className="mt-8">
-          <Button className="w-full" onClick={onAplicar}>
-            Aplicar filtro
+        <SheetFooter className="mt-8 pt-6 border-t">
+          <Button
+            className="w-full h-12 text-base font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
+            onClick={onAplicar}
+          >
+            Aplicar filtros
           </Button>
         </SheetFooter>
       </SheetContent>

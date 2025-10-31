@@ -10,7 +10,7 @@ import { criarAnuncioSchema } from "@/schema/criar-anuncio-schema";
 import UploadFotos from "@/components/Anuncios/Form/UploadFotos";
 import { useCloudinaryConfig } from "@/hooks/useCloudinaryConfig";
 import { toast } from "sonner";
-import { z } from "zod";
+import type { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -54,7 +54,7 @@ export default function AnuncioPage() {
     { id: 13, nome: "Tabuleiros", icon: "🎲" },
     { id: 14, nome: "Videogames", icon: "🎮" },
   ];
-  
+
   const condicoes = [
     { value: "NOVO", label: "Novo" },
     { value: "USADO", label: "Usado" },
@@ -64,12 +64,6 @@ export default function AnuncioPage() {
     { value: "TROCA", label: "Troca" },
     { value: "DOACAO", label: "Doação" },
   ];
-
-  // const statuses = [
-  //   { value: "DISPONIVEL", label: "Disponível" },
-  //   { value: "NEGOCIANDO", label: "Negociando" },
-  //   { value: "FINALIZADO", label: "Finalizado" },
-  // ] as const;
 
   type CriarAnuncioSchemaType = z.infer<typeof criarAnuncioSchema>;
 
@@ -82,16 +76,6 @@ export default function AnuncioPage() {
     setValue,
   } = useForm<CriarAnuncioSchemaType>({
     resolver: zodResolver(criarAnuncioSchema),
-    // defaultValues: {
-    //   titulo: anuncio?.titulo ?? "",
-    //   categoria_id: anuncio?.categoria_id ?? undefined,
-    //   marca: anuncio?.marca ?? "",
-    //   condicao: anuncio?.condicao ?? "USADO",
-    //   descricao: anuncio?.descricao ?? "",
-    //   tipo: anuncio?.tipo ?? "TROCA",
-    //   status: anuncio?.status ?? "DISPONIVEL",
-    //   imagens: [],
-    // },
   });
 
   useEffect(() => {
@@ -128,13 +112,41 @@ export default function AnuncioPage() {
     }
   }, [anuncio, reset]);
 
-  if (!id) return <div className="p-8 text-center">Carregando...</div>;
+  if (!id)
+    return (
+      <div className="min-h-dvh flex items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+
   if (isPending)
-    return <div className="p-8 text-center">Carregando anúncio...</div>;
+    return (
+      <div className="min-h-dvh flex items-center justify-center">
+        <div className="text-center space-y-3">
+          <Loader2 className="h-8 w-8 animate-spin text-primary mx-auto" />
+          <p className="text-muted-foreground">Carregando anúncio...</p>
+        </div>
+      </div>
+    );
+
   if (isError)
-    return <div className="p-8 text-center">Erro: {error?.message}</div>;
+    return (
+      <div className="min-h-dvh flex items-center justify-center p-4">
+        <div className="text-center space-y-2">
+          <p className="text-destructive font-medium">
+            Erro ao carregar anúncio
+          </p>
+          <p className="text-sm text-muted-foreground">{error?.message}</p>
+        </div>
+      </div>
+    );
+
   if (!anuncio)
-    return <div className="p-8 text-center">Anúncio não encontrado.</div>;
+    return (
+      <div className="min-h-dvh flex items-center justify-center">
+        <p className="text-muted-foreground">Anúncio não encontrado.</p>
+      </div>
+    );
 
   async function onSubmit(data: CriarAnuncioSchemaType) {
     const imagensPayload = imagens.map((url, idx) => ({
@@ -161,23 +173,21 @@ export default function AnuncioPage() {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
-      <div className="min-h-dvh bg-background flex flex-col pt-6">
-        <Header texto="Voltar"/>
+      <div className="min-h-dvh bg-gradient-to-b from-background via-background to-primary/5 flex flex-col pt-6">
+        <Header texto="Voltar" />
 
-        <div className="pt-6 max-w-sm mx-auto w-full pb-44">
-          {/* UploadFotos para editar imagens */}
-          <div className="mb-4">
+        <div className="pt-6 max-w-sm mx-auto w-full pb-44 px-4">
+          <div className="mb-6 bg-card rounded-2xl p-4 shadow-md border border-border/50">
+            <h2 className="text-lg font-semibold mb-3">Fotos do Anúncio</h2>
             {cloudErr && (
-              <span className="text-red-500 text-sm">
+              <span className="text-red-500 text-sm block mb-2">
                 Erro ao carregar config do Cloudinary: {cloudErr}
               </span>
             )}
             {loadingCloud ? (
-              <div className="text-sm text-muted-foreground flex items-center">
-                <span>
-                  <Loader2 className="animate-spin text-primary mr-2" />
-                </span>
-                Carregando imagens…
+              <div className="text-sm text-muted-foreground flex items-center justify-center py-8">
+                <Loader2 className="animate-spin text-primary mr-2 h-5 w-5" />
+                <span>Carregando imagens…</span>
               </div>
             ) : cloudConfig ? (
               <UploadFotos
@@ -189,219 +199,210 @@ export default function AnuncioPage() {
                 max={6}
               />
             ) : (
-              <div className="text-sm text-red-500">
+              <div className="text-sm text-red-500 text-center py-4">
                 Não foi possível obter as configurações do Cloudinary.
               </div>
             )}
           </div>
 
-          {/* Preview das imagens (opcional) */}
-          {/* <div className="aspect-square overflow-hidden">
-            <ImageCarousel
-              imagens={imagens.map((url) => ({ url_imagem: url }))}
-              titulo={anuncio.titulo}
-            />
-          </div> */}
-
-          <div className="space-y-2 mb-6">
-            <Label htmlFor="titulo">Titulo</Label>
-            <Input
-              id="titulo"
-              type="text"
-              placeholder="Insira um Titulo"
-              {...register("titulo")}
-              required
-              aria-invalid={!!errors.titulo}
-              aria-describedby={errors.titulo ? "titulo-error" : undefined}
-            />
-            {errors.titulo && (
-              <span id="titulo-error" className="text-sm text-red-500">
-                {errors.titulo.message}
-              </span>
-            )}
-          </div>
-
-          <div className="grid grid-cols-2 gap-4 mb-4">
-            {/* Marca */}
-            <div className="flex-col space-y-2">
-              <Label htmlFor="marca">Marca</Label>
+          <div className="bg-card rounded-2xl p-5 shadow-md border border-border/50 space-y-5">
+            <div className="space-y-2">
+              <Label htmlFor="titulo" className="text-base font-medium">
+                Título
+              </Label>
               <Input
-                id="marca"
+                id="titulo"
                 type="text"
-                placeholder="Insira um marca"
-                {...register("marca")}
-                aria-invalid={!!errors.marca}
-                aria-describedby={errors.marca ? "marca-error" : undefined}
+                placeholder="Ex: Carrinho Hot Wheels Azul"
+                className="h-12 rounded-xl"
+                {...register("titulo")}
+                required
+                aria-invalid={!!errors.titulo}
+                aria-describedby={errors.titulo ? "titulo-error" : undefined}
               />
-            </div>
-
-            <div className="flex-col space-y-2">
-              <Label htmlFor="condicao">Condição</Label>
-              <Controller
-                name="condicao"
-                control={control}
-                render={({ field }) => (
-                  <Select
-                    value={field.value ?? undefined}
-                    onValueChange={field.onChange}
-                  >
-                    <SelectTrigger
-                      className="data-[size=default]:h-12 rounded-2xl w-[175px]"
-                      id="condicao"
-                    >
-                      <SelectValue placeholder="Selecione a condição" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {condicoes.map((opt) => (
-                        <SelectItem key={opt.value} value={opt.value}>
-                          {opt.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                )}
-              />
-              {errors.condicao && (
-                <span id="condicao-error" className="text-sm text-red-500">
-                  {errors.condicao.message as string}
+              {errors.titulo && (
+                <span
+                  id="titulo-error"
+                  className="text-sm text-red-500 flex items-center gap-1"
+                >
+                  {errors.titulo.message}
                 </span>
               )}
             </div>
 
-            <div className="flex-col space-y-2">
-              <Label htmlFor="tipo">Tipo</Label>
-              <Controller
-                name="tipo"
-                control={control}
-                render={({ field }) => (
-                  <Select
-                    value={field.value ?? undefined}
-                    onValueChange={field.onChange}
-                  >
-                    <SelectTrigger
-                      className="data-[size=default]:h-12 rounded-2xl w-[175px]"
-                      id="tipo"
-                    >
-                      <SelectValue placeholder="Selecione o tipo" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {tipos.map((opt) => (
-                        <SelectItem key={opt.value} value={opt.value}>
-                          {opt.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="marca" className="text-base font-medium">
+                  Marca
+                </Label>
+                <Input
+                  id="marca"
+                  type="text"
+                  placeholder="Ex: Mattel"
+                  className="h-12 rounded-xl"
+                  {...register("marca")}
+                  aria-invalid={!!errors.marca}
+                  aria-describedby={errors.marca ? "marca-error" : undefined}
+                />
+                {errors.marca && (
+                  <span id="marca-error" className="text-sm text-red-500">
+                    {errors.marca.message}
+                  </span>
                 )}
-              />
-              {errors.tipo && (
-                <span id="tipo-error" className="text-sm text-red-500">
-                  {errors.tipo.message as string}
-                </span>
-              )}
-            </div>
+              </div>
 
-            {/* {anuncio.endereco_completo && (
-          <div className="flex items-center gap-1 text-xs text-muted-foreground mb-4">
-            <MapPin className="h-4 w-4" />
-            <span>{anuncio.endereco_completo}</span>
-          </div>
-        )} */}
-
-            {anuncio.categoria_id && (
-              <div className="flex-col space-y-2">
-                <Label htmlFor="categoria_id">Categoria</Label>
+              <div className="space-y-2">
+                <Label htmlFor="condicao" className="text-base font-medium">
+                  Condição
+                </Label>
                 <Controller
-                  name="categoria_id"
+                  name="condicao"
                   control={control}
                   render={({ field }) => (
                     <Select
-                      value={field.value != undefined && field.value !== null ? String(field.value) : undefined}
-                      onValueChange={(v) => field.onChange(Number(v))}
+                      value={field.value ?? undefined}
+                      onValueChange={field.onChange}
                     >
-                      <SelectTrigger
-                        className="data-[size=default]:h-12 rounded-2xl w-[175px]"
-                        id="categoria_id"
-                      >
-                        <SelectValue placeholder="Selecione a categoria" />
+                      <SelectTrigger className="h-12 rounded-xl" id="condicao">
+                        <SelectValue placeholder="Selecione" />
                       </SelectTrigger>
                       <SelectContent>
-                        {categorias.map((c) => (
-                          <SelectItem key={c.id} value={String(c.id)}>
-                            {c.icon} {c.nome}
+                        {condicoes.map((opt) => (
+                          <SelectItem key={opt.value} value={opt.value}>
+                            {opt.label}
                           </SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
                   )}
                 />
-                {errors.categoria_id && (
-                  <span
-                    id="categoria_id-error"
-                    className="text-sm text-red-500"
-                  >
-                    {errors.categoria_id.message as string}
+                {errors.condicao && (
+                  <span id="condicao-error" className="text-sm text-red-500">
+                    {errors.condicao.message as string}
                   </span>
                 )}
               </div>
-            )}
+            </div>
 
-            {/* <div className="flex-col space-y-2">
-              <Label htmlFor="status">Status</Label>
-              <Controller
-                name="status"
-                control={control}
-                render={({ field }) => (
-                  <Select
-                    value={field.value ?? ""}
-                    onValueChange={field.onChange}
-                  >
-                    <SelectTrigger id="status">
-                      <SelectValue placeholder="Selecione o status" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {statuses.map((opt) => (
-                        <SelectItem key={opt.value} value={opt.value}>
-                          {opt.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="tipo" className="text-base font-medium">
+                  Tipo
+                </Label>
+                <Controller
+                  name="tipo"
+                  control={control}
+                  render={({ field }) => (
+                    <Select
+                      value={field.value ?? undefined}
+                      onValueChange={field.onChange}
+                    >
+                      <SelectTrigger className="h-12 rounded-xl" id="tipo">
+                        <SelectValue placeholder="Selecione" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {tipos.map((opt) => (
+                          <SelectItem key={opt.value} value={opt.value}>
+                            {opt.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
+                />
+                {errors.tipo && (
+                  <span id="tipo-error" className="text-sm text-red-500">
+                    {errors.tipo.message as string}
+                  </span>
                 )}
+              </div>
+
+              {anuncio.categoria_id && (
+                <div className="space-y-2">
+                  <Label
+                    htmlFor="categoria_id"
+                    className="text-base font-medium"
+                  >
+                    Categoria
+                  </Label>
+                  <Controller
+                    name="categoria_id"
+                    control={control}
+                    render={({ field }) => (
+                      <Select
+                        value={
+                          field.value != undefined && field.value !== null
+                            ? String(field.value)
+                            : undefined
+                        }
+                        onValueChange={(v) => field.onChange(Number(v))}
+                      >
+                        <SelectTrigger
+                          className="h-12 rounded-xl"
+                          id="categoria_id"
+                        >
+                          <SelectValue placeholder="Selecione" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {categorias.map((c) => (
+                            <SelectItem key={c.id} value={String(c.id)}>
+                              {c.icon} {c.nome}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    )}
+                  />
+                  {errors.categoria_id && (
+                    <span
+                      id="categoria_id-error"
+                      className="text-sm text-red-500"
+                    >
+                      {errors.categoria_id.message as string}
+                    </span>
+                  )}
+                </div>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="descricao" className="text-base font-medium">
+                Descrição
+              </Label>
+              <Textarea
+                id="descricao"
+                placeholder="Descreva o brinquedo, seu estado e detalhes importantes..."
+                className="min-h-[120px] rounded-xl resize-none"
+                {...register("descricao")}
+                required
+                aria-invalid={!!errors.descricao}
+                aria-describedby={
+                  errors.descricao ? "descricao-error" : undefined
+                }
               />
-              {errors.status && (
-                <span id="status-error" className="text-sm text-red-500">
-                  {errors.status.message as string}
+              {errors.descricao && (
+                <span id="descricao-error" className="text-sm text-red-500">
+                  {errors.descricao.message}
                 </span>
               )}
-            </div> */}
+            </div>
           </div>
-          <p className="font-semibold">Descrição</p>
-          <Textarea
-            id="descricao"
-            placeholder="Insira um descricao"
-            {...register("descricao")}
-            required
-            aria-invalid={!!errors.descricao}
-            aria-describedby={errors.descricao ? "descricao-error" : undefined}
-          />
-          <div>
-            <Button
-              disabled={updateAnuncio.isPending}
-              className="w-full h-12 text-base font-medium dark:text-white mt-6"
-              type="submit"
-            >
-              {updateAnuncio.isPending ? (
-                <span className="flex items-center gap-2">
-                  <Loader2 className="animate-spin" /> Salvando...
-                </span>
-              ) : (
-                <span className="flex items-center gap-2">
-                  <Save /> Salvar Alterações
-                </span>
-              )}
-            </Button>
-          </div>
+
+          <Button
+            disabled={updateAnuncio.isPending}
+            className="w-full h-14 text-base font-semibold dark:text-white mt-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
+            type="submit"
+          >
+            {updateAnuncio.isPending ? (
+              <span className="flex items-center gap-2">
+                <Loader2 className="animate-spin h-5 w-5" /> Salvando...
+              </span>
+            ) : (
+              <span className="flex items-center gap-2">
+                <Save className="h-5 w-5" /> Salvar Alterações
+              </span>
+            )}
+          </Button>
         </div>
 
         <div className="fixed bottom-0 w-full flex justify-center">

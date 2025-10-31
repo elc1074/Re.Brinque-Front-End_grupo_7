@@ -1,10 +1,16 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
-import logo from '@/assets/image.png';
+import logo from "@/assets/image.png";
 
 export default function PWAPrompt() {
   const [show, setShow] = useState(false);
@@ -14,7 +20,10 @@ export default function PWAPrompt() {
     // Não mostrar se já instalou
     if (typeof window === "undefined") return;
     // iOS: window.navigator.standalone pode não existir
-    const isStandalone = window.matchMedia('(display-mode: standalone)').matches || ("standalone" in window.navigator && (window.navigator as any).standalone);
+    const isStandalone =
+      window.matchMedia("(display-mode: standalone)").matches ||
+      ("standalone" in window.navigator &&
+        (window.navigator as any).standalone);
     if (isStandalone) {
       return;
     }
@@ -27,7 +36,8 @@ export default function PWAPrompt() {
       setShow(true);
     }
     window.addEventListener("beforeinstallprompt", beforeInstallPrompt);
-    return () => window.removeEventListener("beforeinstallprompt", beforeInstallPrompt);
+    return () =>
+      window.removeEventListener("beforeinstallprompt", beforeInstallPrompt);
   }, []);
 
   const handleInstall = async () => {
@@ -53,12 +63,7 @@ export default function PWAPrompt() {
     <Dialog open={show} onOpenChange={setShow}>
       <DialogContent>
         <DialogHeader className="flex items-center justify-center gap-2">
-            <Image 
-            src={logo}
-            alt="App Icon"
-            width={48}
-            height={48}
-            />
+          <Image src={logo} alt="App Icon" width={48} height={48} />
           <DialogTitle>Instale nosso app!</DialogTitle>
         </DialogHeader>
         <div className="py-2 text-center">

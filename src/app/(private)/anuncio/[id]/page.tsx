@@ -3,10 +3,12 @@
 import { useParams, useRouter } from "next/navigation";
 import { useAnuncioById } from "@/hooks/useAnuncioById";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import BottomNav from "@/components/Botoes/Bottom/button-nav";
 import ImageCarousel from "@/components/Anuncios/Anuncio-image";
 import { api, getTokenFromCookies, setAuthHeader } from "@/lib/api";
 import Header from "@/components/Headers/header";
+import { MessageCircle, Loader2 } from "lucide-react";
 
 export default function AnuncioPage() {
   const { id } = useParams<{ id: string }>();
@@ -34,9 +36,12 @@ export default function AnuncioPage() {
       });
 
       const conversa = res.data;
-      // Passa o nome do anunciante como parâmetro na URL
       const nomeAnunciante = anuncio?.nome_usuario || "Usuário";
-      router.push(`/chat?conversa=${conversa.id}&nome=${encodeURIComponent(nomeAnunciante)}`);
+      router.push(
+        `/chat?conversa=${conversa.id}&nome=${encodeURIComponent(
+          nomeAnunciante
+        )}`
+      );
     } catch (err) {
       console.error("Erro ao iniciar conversa:", err);
     }
@@ -80,13 +85,41 @@ export default function AnuncioPage() {
       : "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 border-blue-500 dark:border-blue-300";
   };
 
-  if (!id) return <div className="p-8 text-center">Carregando...</div>;
+  if (!id)
+    return (
+      <div className="min-h-dvh flex items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+
   if (isPending)
-    return <div className="p-8 text-center">Carregando anúncio...</div>;
+    return (
+      <div className="min-h-dvh flex items-center justify-center">
+        <div className="text-center space-y-3">
+          <Loader2 className="h-8 w-8 animate-spin text-primary mx-auto" />
+          <p className="text-muted-foreground">Carregando anúncio...</p>
+        </div>
+      </div>
+    );
+
   if (isError)
-    return <div className="p-8 text-center">Erro: {error?.message}</div>;
+    return (
+      <div className="min-h-dvh flex items-center justify-center p-4">
+        <div className="text-center space-y-2">
+          <p className="text-destructive font-medium">
+            Erro ao carregar anúncio
+          </p>
+          <p className="text-sm text-muted-foreground">{error?.message}</p>
+        </div>
+      </div>
+    );
+
   if (!anuncio)
-    return <div className="p-8 text-center">Anúncio não encontrado.</div>;
+    return (
+      <div className="min-h-dvh flex items-center justify-center">
+        <p className="text-muted-foreground">Anúncio não encontrado.</p>
+      </div>
+    );
 
   const imagensNormalizadas = Array.isArray(anuncio.imagens)
     ? anuncio.imagens
@@ -97,84 +130,97 @@ export default function AnuncioPage() {
     : [];
 
   return (
-    <div className="min-h-dvh bg-background flex flex-col pt-6">
+    <div className="min-h-dvh bg-gradient-to-b from-background via-background to-primary/5 flex flex-col pt-6">
       <Header texto="Voltar" />
 
-      <div className="pt-6 max-w-sm mx-auto w-full pb-44">
-        <div className="aspect-square overflow-hidden">
+      <div className="pt-6 max-w-sm mx-auto w-full pb-44 px-4">
+        <div className="aspect-square overflow-hidden rounded-2xl shadow-lg border border-border/50 mb-6">
           <ImageCarousel
             imagens={imagensNormalizadas}
             titulo={anuncio.titulo}
           />
         </div>
 
-        {/* Titulo */}
-        <div className="pt-4 pb-2 px-2">
-          <h1 className="text-2xl font-bold mb-2 text-foreground">
-            {anuncio.titulo}
-          </h1>
-          {!isDono && (
-            <h3>
-              <span className="font-semibold">Anunciado por: </span>
-              {anuncio.nome_usuario || "Usuário desconhecido"}
-            </h3>
-          )}
-
-          {isDono && (
-            <h3>
-              <span className="font-semibold">Anunciado por: </span>
-              Este anuncio foi criado por você
-            </h3>
-          )}
-        </div>
-
-        <div className="grid grid-cols-2 gap-4 mb-4 px-2">
-          <div className="flex-col">
-            <p className="font-semibold">Marca </p>
-            <span className="text-muted-foreground">
-              {anuncio.marca || "Sem marca"}
-            </span>
-          </div>
-
-          <div className="flex-col">
-            <p className="font-semibold">Condição </p>
-            <Badge className={getCondicaoColor(anuncio.condicao)}>
-              {anuncio.condicao}
-            </Badge>
-          </div>
-
-          <div className="flex-col">
-            <p className="font-semibold">Tipo </p>
-            <Badge className={getTipoColor(anuncio.tipo)}>{anuncio.tipo}</Badge>
-          </div>
-
-          {anuncio.categoria_id && (
-            <div className="flex-col">
-              <p className="font-semibold">Categoria </p>
-              <span className="text-muted-foreground">
-                {categoria_id
-                  ? `${categoria_id.icon} ${categoria_id.nome}`
-                  : "Sem categoria"}
+        <div className="bg-card rounded-2xl p-5 shadow-md border border-border/50 space-y-5">
+          {/* Titulo e anunciante */}
+          <div>
+            <h1 className="text-2xl font-bold mb-3 text-foreground leading-tight">
+              {anuncio.titulo}
+            </h1>
+            <div className="flex items-center gap-2 text-sm">
+              <span className="font-medium text-muted-foreground">
+                Anunciado por:
+              </span>
+              <span className="font-semibold text-foreground">
+                {isDono
+                  ? "Você"
+                  : anuncio.nome_usuario || "Usuário desconhecido"}
               </span>
             </div>
-          )}
-        </div>
-
-        <div className="px-2">
-          <p className="font-semibold">Descrição</p>
-          <p className="text-base text-foreground mb-4">{anuncio.descricao}</p>
-        </div>
-
-        {/* Botão de conversa */}
-        {!isDono && (
-          <div className="mt-6 px-2">
-            <button
-              onClick={iniciarConversa}
-              className="w-full bg-primary text-white py-2 rounded-lg"
-            >
-              Conversar com {anuncio.nome_usuario}
-            </button>
           </div>
+
+          <div className="grid grid-cols-2 gap-4 pt-2">
+            <div className="space-y-1">
+              <p className="text-sm font-semibold text-muted-foreground">
+                Marca
+              </p>
+              <p className="text-base font-medium">
+                {anuncio.marca || "Sem marca"}
+              </p>
+            </div>
+
+            <div className="space-y-1">
+              <p className="text-sm font-semibold text-muted-foreground">
+                Condição
+              </p>
+              <Badge
+                className={`${getCondicaoColor(anuncio.condicao)} font-medium`}
+              >
+                {anuncio.condicao}
+              </Badge>
+            </div>
+
+            <div className="space-y-1">
+              <p className="text-sm font-semibold text-muted-foreground">
+                Tipo
+              </p>
+              <Badge className={`${getTipoColor(anuncio.tipo)} font-medium`}>
+                {anuncio.tipo}
+              </Badge>
+            </div>
+
+            {anuncio.categoria_id && (
+              <div className="space-y-1">
+                <p className="text-sm font-semibold text-muted-foreground">
+                  Categoria
+                </p>
+                <p className="text-base font-medium">
+                  {categoria_id
+                    ? `${categoria_id.icon} ${categoria_id.nome}`
+                    : "Sem categoria"}
+                </p>
+              </div>
+            )}
+          </div>
+
+          <div className="pt-2 border-t border-border/50">
+            <p className="text-sm font-semibold text-muted-foreground mb-2">
+              Descrição
+            </p>
+            <p className="text-base text-foreground leading-relaxed whitespace-pre-wrap">
+              {anuncio.descricao}
+            </p>
+          </div>
+        </div>
+
+        {!isDono && (
+          <Button
+            onClick={iniciarConversa}
+            className="w-full h-14 text-base font-semibold dark:text-white mt-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
+          >
+            <MessageCircle className="h-5 w-5 mr-2" />
+            Conversar com {anuncio.nome_usuario}
+          </Button>
         )}
       </div>
 

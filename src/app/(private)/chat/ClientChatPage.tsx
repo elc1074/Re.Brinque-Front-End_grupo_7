@@ -20,11 +20,25 @@ export default function ClientChatPage() {
 
   if (!conversaId || !userId) {
     return (
-      <div className="p-6 text-center text-muted-foreground">
-        Conversa inválida.
+      <div className="min-h-dvh bg-background flex items-center justify-center p-6">
+        <div className="text-center space-y-3">
+          <div className="w-16 h-16 rounded-full bg-destructive/10 flex items-center justify-center mx-auto">
+            <span className="text-2xl">⚠️</span>
+          </div>
+          <p className="text-muted-foreground font-medium">Conversa inválida</p>
+          <p className="text-sm text-muted-foreground/70">
+            Não foi possível carregar esta conversa
+          </p>
+        </div>
       </div>
     );
   }
 
-  return <ChatRoom conversationId={conversaId} userId={userId} nomeContato={nomeContato} />;
+  return (
+    <ChatRoom
+      conversationId={conversaId}
+      userId={userId}
+      nomeContato={nomeContato}
+    />
+  );
 }

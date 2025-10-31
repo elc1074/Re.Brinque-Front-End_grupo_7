@@ -1,9 +1,11 @@
 "use client";
 
+import type React from "react";
+
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { X, Plus } from "lucide-react";
+import { X, Plus, ImageIcon } from "lucide-react";
 import Image from "next/image";
 
 interface PreviewFotosProps {
@@ -47,16 +49,19 @@ export default function PreviewFotos({
 
   return (
     <div className="space-y-4">
-      {/* Area de upload */}
       <div
-        className={`border-2 border-dashed rounded-lg p-6 text-center transition-colors ${
+        className={`border-2 border-dashed rounded-2xl p-8 text-center transition-all duration-300 ${
           dragOver
-            ? "border-primary bg-primary/10"
-            : "border-gray-300 hover:border-gray-400"
+            ? "border-primary bg-primary/10 scale-[1.02]"
+            : "border-border hover:border-primary/50 hover:bg-muted/50"
+        } ${
+          value.length >= max
+            ? "opacity-50 cursor-not-allowed"
+            : "cursor-pointer"
         }`}
         onDragOver={(e) => {
           e.preventDefault();
-          setDragOver(true);
+          if (value.length < max) setDragOver(true);
         }}
         onDragLeave={() => setDragOver(false)}
         onDrop={handleDrop}
@@ -70,30 +75,43 @@ export default function PreviewFotos({
           id="file-upload"
           disabled={value.length >= max}
         />
-        <label htmlFor="file-upload" className="cursor-pointer">
-          <Plus className="mx-auto h-8 w-8 text-gray-400 mb-2" />
-          <p className="text-sm text-gray-600">
+        <label htmlFor="file-upload" className="cursor-pointer block">
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/10 mb-4">
+            {dragOver ? (
+              <ImageIcon className="h-8 w-8 text-primary animate-bounce" />
+            ) : (
+              <Plus className="h-8 w-8 text-primary" />
+            )}
+          </div>
+          <p className="text-base font-medium text-foreground mb-1">
             {value.length >= max
               ? `Máximo de ${max} fotos atingido`
-              : "Clique ou arraste fotos aqui"}
+              : "Adicione fotos do produto"}
           </p>
-          <p className="text-xs text-gray-400 mt-1">PNG, JPG até 10MB cada</p>
+          <p className="text-sm text-muted-foreground">
+            Clique ou arraste imagens aqui
+          </p>
+          <p className="text-xs text-muted-foreground mt-2">
+            PNG, JPG até 10MB cada
+          </p>
         </label>
       </div>
 
-      {/* Preview das imagens */}
       {value.length > 0 && (
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-2 gap-4">
           {value.map((file, index) => (
-            <div key={index} className="relative">
-              <div className="aspect-square rounded-lg overflow-hidden bg-gray-100">
+            <div
+              key={index}
+              className="relative group animate-in fade-in zoom-in duration-300"
+              style={{ animationDelay: `${index * 50}ms` }}
+            >
+              <div className="aspect-square rounded-xl overflow-hidden bg-muted border-2 border-border shadow-md group-hover:shadow-xl transition-all duration-300">
                 <Image
-                  src={createPreviewUrl(file)}
+                  src={createPreviewUrl(file) || "/placeholder.svg"}
                   alt={`Preview ${index + 1}`}
                   fill
-                  className="object-cover"
+                  className="object-cover group-hover:scale-105 transition-transform duration-300"
                   onLoad={() => {
-                    // Cleanup do URL quando a imagem carregar
                     if (file) {
                       setTimeout(() => {
                         URL.revokeObjectURL(createPreviewUrl(file));
@@ -106,13 +124,13 @@ export default function PreviewFotos({
                 type="button"
                 variant="destructive"
                 size="icon"
-                className="absolute -top-2 -right-2 h-6 w-6 rounded-full"
+                className="absolute -top-2 -right-2 h-7 w-7 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200"
                 onClick={() => removeFile(index)}
               >
-                <X className="h-3 w-3" />
+                <X className="h-4 w-4" />
               </Button>
               {index === 0 && (
-                <div className="absolute bottom-2 left-2 bg-primary text-white text-xs px-2 py-1 rounded">
+                <div className="absolute bottom-2 left-2 bg-primary text-primary-foreground text-xs font-medium px-3 py-1 rounded-full shadow-md">
                   Principal
                 </div>
               )}
@@ -121,10 +139,16 @@ export default function PreviewFotos({
         </div>
       )}
 
-      <p className="text-sm text-gray-500">
-        {value.length} de {max} fotos selecionadas
-        {value.length > 0 && " • A primeira foto será a principal"}
-      </p>
+      <div className="flex items-center justify-between text-sm">
+        <span className="text-muted-foreground">
+          {value.length} de {max} fotos selecionadas
+        </span>
+        {value.length > 0 && (
+          <span className="text-xs text-muted-foreground">
+            A primeira foto será a principal
+          </span>
+        )}
+      </div>
     </div>
   );
 }
