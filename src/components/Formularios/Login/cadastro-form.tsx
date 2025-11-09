@@ -15,6 +15,7 @@ import { maskTelefone } from "@/lib/maskTelefone";
 import { toast } from "sonner";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import Link from "next/link";
+import { moderarTexto } from "@/lib/moderarTexto";
 
 type CadastroFormValues = z.infer<typeof cadastroSchema>;
 
@@ -34,6 +35,13 @@ export default function CadastroForm() {
   });
 
   async function onSubmit(values: CadastroFormValues) {
+    const nomeAprovado = await moderarTexto(values.nome_completo);
+
+    if (!nomeAprovado) {
+      toast.error("Nome contém conteúdo impróprio. Por favor, escolha outro.");
+      return;
+    }
+
     try {
       const data = await cadastrar(values);
       if (data?.message) {

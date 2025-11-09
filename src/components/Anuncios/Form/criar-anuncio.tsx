@@ -17,6 +17,8 @@ import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import PreviewFotos from "./preview-image";
 import { useCloudinaryConfig } from "@/hooks/useCloudinaryConfig";
+import { moderarTexto } from "@/lib/moderarTexto";
+
 
 const categorias = [
   { id: 1, nome: "Artísticos", icon: "🎨" },
@@ -149,6 +151,15 @@ export default function CriarAnuncioForm({
 
   const onSubmit = async (values: CriarAnuncioFormType): Promise<void> => {
     try {
+      const textoParaModerar = `${values.titulo}\n\n${values.descricao}`;
+      const textoAprovado = await moderarTexto(textoParaModerar);
+
+      if (!textoAprovado) {
+        toast.error("Título ou descrição contém conteúdo impróprio.");
+        setStep(2); // volta para etapa de texto
+        return;
+      }
+
       toast.loading("Analisando imagens...");
 
       const imagens = await uploadImagens(arquivos);
