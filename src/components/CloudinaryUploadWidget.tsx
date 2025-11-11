@@ -13,6 +13,7 @@ interface CloudinaryUploadWidgetProps {
   folder?: string;
 }
 
+
 export const CloudinaryUploadWidget = ({
   children,
   onSuccess,
@@ -23,22 +24,37 @@ export const CloudinaryUploadWidget = ({
   cropping = false,
   folder,
 }: CloudinaryUploadWidgetProps) => {
-  const [loaded, setLoaded] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
 
-  useEffect(() => {
-    const script = document.createElement("script");
-    script.src = "https://upload-widget.cloudinary.com/global/all.js";
-    script.async = true;
-    script.onload = () => setLoaded(true);
-    document.body.appendChild(script);
+  // Upload direto via input
+  const handleFileInput = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(event.target.files || []);
+    if (!files.length) return;
+    setIsUploading(true);
+    for (const file of files) {
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("upload_preset", uploadPreset);
+      try {
+        const res = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
+          method: "POST",
+          body: formData,
+        });
+        const data = await res.json();
+        if (data.secure_url) {
+          onSuccess({ info: { secure_url: data.secure_url }, event: "success" });
+        }
+      } catch (err) {
+        // erro no upload
+      }
+    }
+    setIsUploading(false);
+    event.target.value = "";
+  };
 
-    return () => {
-      document.body.removeChild(script);
-    };
-  }, []);
-
+  // Botão para abrir widget (mantido para desktop)
   const openWidget = () => {
-    if (loaded && window.cloudinary) {
+    if (window.cloudinary) {
       const widget = window.cloudinary.createUploadWidget(
         {
           cloudName,
@@ -81,7 +97,26 @@ export const CloudinaryUploadWidget = ({
     }
   };
 
-  return children({ open: openWidget });
+  // Renderiza input e botão
+  return (
+    <>
+      <input
+        type="file"
+        accept="image/*"
+        multiple={multiple}
+        style={{ display: "none" }}
+        id="cloudinary-upload-input"
+        onChange={handleFileInput}
+        disabled={isUploading}
+      />
+      {children({
+        open: () => {
+          const input = document.getElementById("cloudinary-upload-input") as HTMLInputElement;
+          if (input) input.click();
+        },
+      })}
+    </>
+  );
 };
 
 export default CloudinaryUploadWidget;
