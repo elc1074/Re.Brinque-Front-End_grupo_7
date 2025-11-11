@@ -121,7 +121,7 @@ export default function ConversationList({ userId, onSelect }: Props) {
               >
                 <div className="flex items-start gap-4">
                   <Avatar className="h-14 w-14 text-xl border-2 border-primary/20 group-hover:border-primary/40 transition-all duration-300">
-                    <AvatarImage src={fotoContato} alt={nomeContato} />
+                    <AvatarImage src={fotoContato} alt={nomeContato} className="object-cover"/>
                     <AvatarFallback className="bg-gradient-to-br from-primary/20 to-primary/10 text-primary">
                       {nomeContato?.slice(0, 2).toUpperCase()}
                     </AvatarFallback>
