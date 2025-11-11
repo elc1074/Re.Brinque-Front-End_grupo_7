@@ -1,4 +1,3 @@
-"use client";
 import { useEffect, useState } from "react";
 import { api, getTokenFromCookies, setAuthHeader } from "@/lib/api";
 import type { Conversa } from "@/interface/IChat";
@@ -14,6 +13,7 @@ interface Props {
 export default function ConversationList({ userId, onSelect }: Props) {
   const [conversas, setConversas] = useState<Conversa[]>([]);
   const [loading, setLoading] = useState(true);
+  const [fotos, setFotos] = useState<Record<number, string>>({});
 
   useEffect(() => {
     const token = getTokenFromCookies();
@@ -32,6 +32,30 @@ export default function ConversationList({ userId, onSelect }: Props) {
 
     fetchConversas();
   }, [userId]);
+
+  useEffect(() => {
+    async function fetchFotos() {
+      const ids = conversas.map((conv) =>
+        conv.anunciante_id === userId ? conv.interessado_id : conv.anunciante_id
+      );
+      const uniqueIds = Array.from(new Set(ids));
+      const fotosObj: Record<number, string> = {};
+
+      await Promise.all(
+        uniqueIds.map(async (id) => {
+          if (!id) return;
+          try {
+            const res = await api.get(`/api/usuarios/${id}/foto`);
+            fotosObj[id] = res.data?.foto_perfil_url || "";
+          } catch {
+            fotosObj[id] = "";
+          }
+        })
+      );
+      setFotos(fotosObj);
+    }
+    if (conversas.length > 0) fetchFotos();
+  }, [conversas, userId]);
 
   if (loading) {
     return (
@@ -77,12 +101,13 @@ export default function ConversationList({ userId, onSelect }: Props) {
             : "";
 
           const isDonoConv = conv.anunciante_id === userId;
+          const contatoId = isDonoConv
+            ? conv.interessado_id
+            : conv.anunciante_id;
           const nomeContato = isDonoConv
             ? conv.nome_interessado
             : conv.nome_anunciante;
-
-            // Se a API não retorna foto, sempre mostra só as iniciais
-            const fotoContato = undefined;
+          const fotoContato = fotos[contatoId] || "";
 
           return (
             <li
@@ -96,7 +121,7 @@ export default function ConversationList({ userId, onSelect }: Props) {
               >
                 <div className="flex items-start gap-4">
                   <Avatar className="h-14 w-14 text-xl border-2 border-primary/20 group-hover:border-primary/40 transition-all duration-300">
-                    <AvatarImage src={fotoContato ?? ""} alt={nomeContato} />
+                    <AvatarImage src={fotoContato} alt={nomeContato} />
                     <AvatarFallback className="bg-gradient-to-br from-primary/20 to-primary/10 text-primary">
                       {nomeContato?.slice(0, 2).toUpperCase()}
                     </AvatarFallback>

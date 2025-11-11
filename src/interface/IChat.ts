@@ -8,6 +8,7 @@ export interface Conversa {
   nome_anunciante: string;
   anunciante_id: number;
   nome_interessado: string;
+  interessado_id: number;
 }
 
 export interface Mensagem {
