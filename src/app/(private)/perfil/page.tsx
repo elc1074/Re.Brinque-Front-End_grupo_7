@@ -3,19 +3,25 @@
 import type React from "react";
 
 import BottomNav from "@/components/Botoes/Bottom/button-nav";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
   Camera,
   ChevronRight,
+  Loader2,
   LogOut,
   Moon,
+  Pencil,
   PencilLine,
   ShoppingBag,
 } from "lucide-react";
 import { useTheme } from "next-themes";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useFotoPerfil, useUpdateFotoPerfil } from "@/hooks/usePerfil";
+import { toast } from "sonner";
+import CloudinaryUploadWidget from "@/components/CloudinaryUploadWidget";
+import { useCloudinaryConfig } from "@/hooks/useCloudinaryConfig";
 
 function Row({
   icon,
@@ -94,6 +100,27 @@ export default function PerfilPage() {
   const router = useRouter();
   const { theme, setTheme } = useTheme();
   const darkEnabled = theme === "dark";
+  const { data, isLoading } = useFotoPerfil(id);
+  const { mutate: updateFoto, isPending: isUpdatingFoto } =
+    useUpdateFotoPerfil();
+  const { config, loading: isConfigLoading } = useCloudinaryConfig();
+
+  const handleUploadSuccess = (result: any) => {
+    const imageUrl = result.info.secure_url;
+    if (id) {
+      updateFoto(
+        { userId: id, foto_perfil_url: imageUrl },
+        {
+          onSuccess: () => {
+            toast.success("Foto de perfil atualizada com sucesso!");
+          },
+          onError: (error) => {
+            toast.error(`Erro ao atualizar a foto: ${error.message}`);
+          },
+        }
+      );
+    }
+  };
 
   const handleLogout = async () => {
     try {
@@ -116,23 +143,55 @@ export default function PerfilPage() {
 
       <section className="bg-background rounded-t-3xl shadow-lg -mt-2">
         <div className="mt-8 flex flex-col items-center">
-          <div className="relative group">
-            <Avatar className="h-24 w-24 text-xl border-4 border-background shadow-xl">
-              <AvatarFallback className="bg-gradient-to-br from-primary/20 to-primary/10 text-primary text-2xl font-bold">
-                {userInitials}
-              </AvatarFallback>
-            </Avatar>
-            <span className="absolute -bottom-1 -right-1 size-8 rounded-full bg-primary grid place-content-center border-2 border-background shadow-lg group-hover:scale-110 transition-transform cursor-pointer">
-              <Camera className="size-4 text-white" />
-            </span>
-          </div>
+          <CloudinaryUploadWidget
+            onSuccess={handleUploadSuccess}
+            cloudName="deirx3_staging"
+            uploadPreset={config?.uploadPreset ?? ""}
+            apiKey={config?.apiKey ?? ""}
+            cropping={true}
+            multiple={false}
+            folder="fotos_perfil"
+          >
+            {({ open }) => (
+              <button
+                type="button"
+                onClick={() => open()}
+                className="relative group"
+                disabled={isUpdatingFoto}
+              >
+                <Avatar className="h-24 w-24 text-xl border-4 border-background shadow-xl">
+                  {isLoading ? (
+                    <Loader2 className="animate-spin" />
+                  ) : (
+                    <>
+                      <AvatarImage
+                        src={data?.foto_perfil_url ?? ""}
+                        alt="Foto de perfil"
+                        className="object-cover"
+                      />
+                      <AvatarFallback className="bg-gradient-to-br from-primary/20 to-primary/10 text-primary text-2xl font-bold">
+                        {userInitials}
+                      </AvatarFallback>
+                    </>
+                  )}
+                </Avatar>
+
+                <span className="absolute -bottom-1 -right-1 size-8 rounded-full bg-primary grid place-content-center border-2 border-background shadow-lg group-hover:scale-110 transition-transform cursor-pointer">
+                  {isUpdatingFoto ? (
+                    <Loader2 className="size-4 text-white animate-spin" />
+                  ) : data?.foto_perfil_url ? (
+                    <Pencil className="size-4 text-white" />
+                  ) : (
+                    <Camera className="size-4 text-white" />
+                  )}
+                </span>
+              </button>
+            )}
+          </CloudinaryUploadWidget>
           <div className="mt-4 flex items-center gap-2">
             <p className="text-lg font-semibold text-zinc-800 dark:text-zinc-100">
               {userName}
             </p>
-            <button className="p-1 hover:bg-muted rounded-full transition-colors">
-              <PencilLine className="size-4 text-zinc-700 dark:text-zinc-300" />
-            </button>
           </div>
         </div>
       </section>

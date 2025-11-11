@@ -3,7 +3,8 @@ import { useEffect, useState } from "react";
 import { api, getTokenFromCookies, setAuthHeader } from "@/lib/api";
 import type { Conversa } from "@/interface/IChat";
 import { Card } from "../ui/card";
-import { UserCircle, MessageCircle } from "lucide-react";
+import { MessageCircle } from "lucide-react";
+import { Avatar, AvatarImage, AvatarFallback } from "../ui/avatar";
 
 interface Props {
   userId: number;
@@ -80,6 +81,9 @@ export default function ConversationList({ userId, onSelect }: Props) {
             ? conv.nome_interessado
             : conv.nome_anunciante;
 
+            // Se a API não retorna foto, sempre mostra só as iniciais
+            const fotoContato = undefined;
+
           return (
             <li
               key={conv.id}
@@ -91,9 +95,12 @@ export default function ConversationList({ userId, onSelect }: Props) {
                 onClick={() => onSelect(conv.id, nomeContato)}
               >
                 <div className="flex items-start gap-4">
-                  <div className="relative h-14 w-14 rounded-full bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center flex-shrink-0 ring-2 ring-primary/20 group-hover:ring-primary/40 transition-all duration-300">
-                    <UserCircle className="w-8 h-8 text-primary group-hover:scale-110 transition-transform duration-300" />
-                  </div>
+                  <Avatar className="h-14 w-14 text-xl border-2 border-primary/20 group-hover:border-primary/40 transition-all duration-300">
+                    <AvatarImage src={fotoContato ?? ""} alt={nomeContato} />
+                    <AvatarFallback className="bg-gradient-to-br from-primary/20 to-primary/10 text-primary">
+                      {nomeContato?.slice(0, 2).toUpperCase()}
+                    </AvatarFallback>
+                  </Avatar>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1">
                       <span className="font-semibold text-foreground truncate group-hover:text-primary transition-colors duration-300">
