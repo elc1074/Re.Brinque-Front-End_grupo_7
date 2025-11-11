@@ -20,8 +20,8 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useFotoPerfil, useUpdateFotoPerfil } from "@/hooks/usePerfil";
 import { toast } from "sonner";
-import CloudinaryUploadWidget from "@/components/CloudinaryUploadWidget";
 import { useCloudinaryConfig } from "@/hooks/useCloudinaryConfig";
+import { Input } from "@/components/ui/input";
 
 function Row({
   icon,
@@ -143,51 +143,88 @@ export default function PerfilPage() {
 
       <section className="bg-background rounded-t-3xl shadow-lg -mt-2">
         <div className="mt-8 flex flex-col items-center">
-          <CloudinaryUploadWidget
-            onSuccess={handleUploadSuccess}
-            cloudName="deirx3_staging"
-            uploadPreset={config?.uploadPreset ?? ""}
-            apiKey={config?.apiKey ?? ""}
-            cropping={true}
-            multiple={false}
-            folder="fotos_perfil"
-          >
-            {({ open }) => (
-              <button
-                type="button"
-                onClick={() => open()}
-                className="relative group"
-                disabled={isUpdatingFoto}
-              >
-                <Avatar className="h-24 w-24 text-xl border-4 border-background shadow-xl">
-                  {isLoading ? (
-                    <Loader2 className="animate-spin" />
-                  ) : (
-                    <>
-                      <AvatarImage
-                        src={data?.foto_perfil_url ?? ""}
-                        alt="Foto de perfil"
-                        className="object-cover"
-                      />
-                      <AvatarFallback className="bg-gradient-to-br from-primary/20 to-primary/10 text-primary text-2xl font-bold">
-                        {userInitials}
-                      </AvatarFallback>
-                    </>
-                  )}
-                </Avatar>
+          <div className="relative">
+            <Avatar className="size-24">
+              <AvatarImage
+                src={data?.foto_perfil_url ?? undefined}
+                alt={userName}
+                className="object-cover"
+              />
+              <AvatarFallback>{userInitials}</AvatarFallback>
+            </Avatar>
+            <label
+              className="absolute bottom-2 right-2 bg-primary text-white rounded-full p-2 shadow-md hover:bg-primary/80 transition-colors flex items-center cursor-pointer"
+              aria-label={
+                data?.foto_perfil_url
+                  ? "Editar foto de perfil"
+                  : "Enviar foto de perfil"
+              }
+            >
+              {isUpdatingFoto ? (
+                <Loader2 className="animate-spin size-5" />
+              ) : data?.foto_perfil_url ? (
+                <Pencil className="size-5" />
+              ) : (
+                <Camera className="size-5" />
+              )}
+              <Input
+                type="file"
+                // Removido o capture para não sugerir câmera
+                accept=".jpg,.jpeg,.png,.webp" // ajuste se quiser outros tipos
+                multiple={false}
+                aria-label="Enviar arquivo de imagem"
+                className="hidden"
+                disabled={isConfigLoading || isUpdatingFoto}
+                onChange={async (e) => {
+                  const file = e.target.files?.[0];
+                  if (!file || !config) return;
 
-                <span className="absolute -bottom-1 -right-1 size-8 rounded-full bg-primary grid place-content-center border-2 border-background shadow-lg group-hover:scale-110 transition-transform cursor-pointer">
-                  {isUpdatingFoto ? (
-                    <Loader2 className="size-4 text-white animate-spin" />
-                  ) : data?.foto_perfil_url ? (
-                    <Pencil className="size-4 text-white" />
-                  ) : (
-                    <Camera className="size-4 text-white" />
-                  )}
-                </span>
-              </button>
-            )}
-          </CloudinaryUploadWidget>
+                  // Validação rápida
+                  if (
+                    !["image/jpeg", "image/png", "image/webp"].includes(
+                      file.type
+                    )
+                  ) {
+                    toast.error("Formato inválido. Envie JPG, PNG ou WEBP.");
+                    e.target.value = "";
+                    return;
+                  }
+                  if (file.size > 10 * 1024 * 1024) {
+                    toast.error("Arquivo acima de 10MB, envie um menor.");
+                    e.target.value = "";
+                    return;
+                  }
+
+                  const formData = new FormData();
+                  formData.append("file", file);
+                  formData.append("upload_preset", config.uploadPreset);
+                  formData.append("api_key", config.apiKey);
+
+                  try {
+                    toast("Enviando arquivo...");
+                    const res = await fetch(
+                      `https://api.cloudinary.com/v1_1/${config.cloudName}/image/upload`,
+                      { method: "POST", body: formData }
+                    );
+                    if (!res.ok) {
+                      toast.error("Falha no upload: " + (await res.text()));
+                      return;
+                    }
+                    const dataImg = await res.json();
+                    if (dataImg.secure_url) {
+                      handleUploadSuccess({
+                        info: { secure_url: dataImg.secure_url },
+                      });
+                    }
+                  } catch {
+                    toast.error("Erro ao enviar arquivo.");
+                  } finally {
+                    e.target.value = "";
+                  }
+                }}
+              />
+            </label>
+          </div>
           <div className="mt-4 flex items-center gap-2">
             <p className="text-lg font-semibold text-zinc-800 dark:text-zinc-100">
               {userName}
