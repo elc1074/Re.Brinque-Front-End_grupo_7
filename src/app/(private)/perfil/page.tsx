@@ -169,59 +169,85 @@ export default function PerfilPage() {
               )}
               <Input
                 type="file"
-                // Removido o capture para não sugerir câmera
-                accept=".jpg,.jpeg,.png,.webp" // ajuste se quiser outros tipos
+                accept=".jpg,.jpeg,.png,.webp" 
                 multiple={false}
                 aria-label="Enviar arquivo de imagem"
                 className="hidden"
                 disabled={isConfigLoading || isUpdatingFoto}
                 onChange={async (e) => {
-                  const file = e.target.files?.[0];
-                  if (!file || !config) return;
+                const file = e.target.files?.[0];
+                if (!file || !config) return;
 
-                  // Validação rápida
-                  if (
-                    !["image/jpeg", "image/png", "image/webp"].includes(
-                      file.type
-                    )
-                  ) {
-                    toast.error("Formato inválido. Envie JPG, PNG ou WEBP.");
+                if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) {
+                  toast.error("Formato inválido. Envie JPG, PNG ou WEBP.");
+                  e.target.value = "";
+                  return;
+                }
+                if (file.size > 10 * 1024 * 1024) {
+                  toast.error("Arquivo acima de 10MB, envie um menor.");
+                  e.target.value = "";
+                  return;
+                }
+
+                try {
+                  toast.dismiss(); 
+                  toast.loading("Analisando imagem...");
+
+                  const modForm = new FormData();
+                  modForm.append("imagem", file);
+
+                  const modRes = await fetch("https://back-rebrinque.onrender.com/api/moderar-upload", {
+                    method: "POST",
+                    body: modForm,
+                  });
+
+                  toast.dismiss(); 
+
+                  if (!modRes.ok) {
+                    toast.error("Erro ao analisar imagem de perfil.");
                     e.target.value = "";
                     return;
                   }
-                  if (file.size > 10 * 1024 * 1024) {
-                    toast.error("Arquivo acima de 10MB, envie um menor.");
+
+                  const modData = await modRes.json();
+                  if (modData.bloqueado) {
+                    toast.error("Imagem bloqueada por conter conteúdo impróprio.");
                     e.target.value = "";
                     return;
                   }
 
-                  const formData = new FormData();
-                  formData.append("file", file);
-                  formData.append("upload_preset", config.uploadPreset);
-                  formData.append("api_key", config.apiKey);
+                  toast.loading("Enviando imagem...");
+                  const uploadData = new FormData();
+                  uploadData.append("file", file);
+                  uploadData.append("upload_preset", config.uploadPreset);
+                  uploadData.append("api_key", config.apiKey);
 
-                  try {
-                    toast("Enviando arquivo...");
-                    const res = await fetch(
-                      `https://api.cloudinary.com/v1_1/${config.cloudName}/image/upload`,
-                      { method: "POST", body: formData }
-                    );
-                    if (!res.ok) {
-                      toast.error("Falha no upload: " + (await res.text()));
-                      return;
-                    }
-                    const dataImg = await res.json();
-                    if (dataImg.secure_url) {
-                      handleUploadSuccess({
-                        info: { secure_url: dataImg.secure_url },
-                      });
-                    }
-                  } catch {
-                    toast.error("Erro ao enviar arquivo.");
-                  } finally {
-                    e.target.value = "";
+                  const uploadRes = await fetch(
+                    `https://api.cloudinary.com/v1_1/${config.cloudName}/image/upload`,
+                    { method: "POST", body: uploadData }
+                  );
+
+                  toast.dismiss();
+
+                  if (!uploadRes.ok) {
+                    toast.error("Falha no upload da imagem.");
+                    return;
                   }
-                }}
+
+                  const dataImg = await uploadRes.json();
+
+                  if (dataImg.secure_url) {
+                    handleUploadSuccess({ info: { secure_url: dataImg.secure_url } });
+                    toast.success("Imagem de perfil atualizada!");
+                  }
+                } catch (error) {
+                  toast.dismiss();
+                  console.error("Erro no upload de imagem de perfil:", error);
+                  toast.error("Erro inesperado ao enviar imagem.");
+                } finally {
+                  e.target.value = "";
+                }
+              }}
               />
             </label>
           </div>

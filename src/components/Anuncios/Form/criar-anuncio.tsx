@@ -151,11 +151,11 @@ export default function CriarAnuncioForm({
 
   const onSubmit = async (values: CriarAnuncioFormType): Promise<void> => {
     try {
-      const textoParaModerar = `${values.titulo}\n\n${values.descricao}`;
+      const textoParaModerar = `${values.titulo}\n\n${values.descricao}\n\n${values.marca ?? ""}`;
       const textoAprovado = await moderarTexto(textoParaModerar);
 
       if (!textoAprovado) {
-        toast.error("Título ou descrição contém conteúdo impróprio.");
+        toast.error("Algum campo contém conteúdo impróprio. Revise o texto digitado.");
         setStep(2); // volta para etapa de texto
         return;
       }
