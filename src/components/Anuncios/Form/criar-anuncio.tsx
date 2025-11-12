@@ -266,10 +266,10 @@ export default function CriarAnuncioForm({
                 placeholder="ex.: Pelúcia Leãozinho com plush macio, cor marrom clássica, antialérgico e tamanho 25cm"
                 {...register("descricao")}
                 className="bg-gray-100 text-lg p-4 min-h-32 resize-none"
-                maxLength={350}
+                maxLength={244}
               />
               <p className="text-sm text-gray-500">
-                {formData.descricao.length} de 350
+                {formData.descricao.length} de 244
               </p>
               {errors.descricao && (
                 <span className="text-red-500 text-sm">
