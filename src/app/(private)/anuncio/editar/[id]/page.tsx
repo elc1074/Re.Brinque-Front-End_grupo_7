@@ -88,30 +88,27 @@ export default function AnuncioPage() {
   }, [imagens, setValue]);
 
   useEffect(() => {
-    if (anuncio && anuncio.condicao && anuncio.tipo && anuncio.categoria_id) {
-      setTimeout(() => {
-        reset({
-          titulo: anuncio.titulo,
-          categoria_id: anuncio.categoria_id,
-          marca: anuncio.marca ?? "",
-          condicao: anuncio.condicao,
-          descricao: anuncio.descricao,
-          tipo: anuncio.tipo,
-          status: anuncio.status,
-          imagens: [],
-        });
-        setImagens(
-          Array.isArray(anuncio.imagens)
-            ? anuncio.imagens
-                .map((img: any) =>
-                  typeof img === "string" ? img : img.url_imagem
-                )
-                .filter((url: any) => typeof url === "string")
-            : []
-        );
-      }, 0);
-    }
-  }, [anuncio, reset]);
+    if (!anuncio) return;
+
+    reset({
+      titulo: anuncio.titulo ?? "",
+      categoria_id: anuncio.categoria_id ?? "",
+      marca: anuncio.marca ?? "",
+      condicao: anuncio.condicao ?? "",
+      descricao: anuncio.descricao ?? "",
+      tipo: anuncio.tipo ?? "",
+      status: anuncio.status ?? "",
+      imagens: [],
+    });
+
+    setImagens(
+      Array.isArray(anuncio.imagens)
+        ? anuncio.imagens.map((img: any) =>
+            typeof img === "string" ? img : img.url_imagem
+          )
+        : []
+    );
+  }, [anuncio]);
 
   async function moderarImagem(file: File) {
     const formData = new FormData();
@@ -126,15 +123,23 @@ export default function AnuncioPage() {
   }
 
   async function verificarImagensExistentes(urls: string[]) {
+    let bloqueada = false;
     const aprovadas: string[] = [];
+
     await Promise.all(
       urls.map(async (url) => {
         const blob = await fetch(url).then((res) => res.blob());
         const aprovada = await moderarImagem(new File([blob], "imagem.jpg"));
-        if (aprovada) aprovadas.push(url);
-        else toast.error("Uma das imagens foi bloqueada por conteúdo impróprio.");
+        if (!aprovada) {
+          bloqueada = true;
+          toast.error("Uma das imagens foi bloqueada por conter conteúdo impróprio.");
+        } else {
+          aprovadas.push(url);
+        }
       })
     );
+
+    if (bloqueada) return null;
     return aprovadas;
   }
 
@@ -142,32 +147,44 @@ export default function AnuncioPage() {
     try {
       const textoParaModerar = `${data.titulo}\n\n${data.descricao}\n\n${data.marca ?? ""}`;
       const textoAprovado = await moderarTexto(textoParaModerar);
+
       if (!textoAprovado) {
         toast.error("O texto contém conteúdo impróprio. Revise o anúncio.");
         return;
       }
+
       const imagensAprovadas = await verificarImagensExistentes(imagens);
+
+      if (!imagensAprovadas) {
+        return;
+      }
+
       if (imagensAprovadas.length === 0) {
         toast.error("Nenhuma imagem válida foi enviada.");
         return;
       }
+
       const imagensPayload = imagensAprovadas.map((url, idx) => ({
         url_imagem: url,
         principal: idx === 0,
       }));
+
       const payload = {
         ...data,
-        categoria_id: data.categoria_id === null ? undefined : data.categoria_id,
+        categoria_id: data.categoria_id ?? undefined,
         imagens: imagensPayload,
       };
+
       const result = await updateAnuncio.mutateAsync({ id, data: payload });
+
       if (result?.error) {
-        return toast.error(result.error);
+        toast.error(result.error);
+        return;
       }
+
       toast.success("Anúncio atualizado com sucesso!");
       router.back();
     } catch (e: any) {
-      console.error("Erro ao atualizar anúncio:", e);
       toast.error(e.message || "Erro inesperado ao atualizar o anúncio.");
     }
   }
@@ -238,78 +255,102 @@ export default function AnuncioPage() {
               </div>
             )}
           </div>
+
           <div className="bg-card rounded-2xl p-5 shadow-md border border-border/50 space-y-5">
             <div className="space-y-2">
               <Label htmlFor="titulo" className="text-base font-medium">Título</Label>
-              <Input id="titulo" type="text" placeholder="Ex: Carrinho Hot Wheels Azul" className="h-12 rounded-xl" {...register("titulo")} required aria-invalid={!!errors.titulo} aria-describedby={errors.titulo ? "titulo-error" : undefined} />
-              {errors.titulo && <span id="titulo-error" className="text-sm text-red-500 flex items-center gap-1">{errors.titulo.message}</span>}
+              <Input id="titulo" type="text" className="h-12 rounded-xl" {...register("titulo")} required />
+              {errors.titulo && <span className="text-sm text-red-500">{errors.titulo.message}</span>}
             </div>
+
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="marca" className="text-base font-medium">Marca</Label>
-                <Input id="marca" type="text" placeholder="Ex: Mattel" className="h-12 rounded-xl" {...register("marca")} aria-invalid={!!errors.marca} aria-describedby={errors.marca ? "marca-error" : undefined} />
-                {errors.marca && <span id="marca-error" className="text-sm text-red-500">{errors.marca.message}</span>}
+                <Input id="marca" type="text" className="h-12 rounded-xl" {...register("marca")} />
+                {errors.marca && <span className="text-sm text-red-500">{errors.marca.message}</span>}
               </div>
+
               <div className="space-y-2">
-                <Label htmlFor="condicao" className="text-base font-medium">Condição</Label>
-                <Controller name="condicao" control={control} render={({ field }) => (
-                  <Select value={field.value ?? undefined} onValueChange={field.onChange}>
-                    <SelectTrigger className="h-12 rounded-xl" id="condicao">
-                      <SelectValue placeholder="Selecione" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {condicoes.map((opt) => (
-                        <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                )}/>
-                {errors.condicao && <span id="condicao-error" className="text-sm text-red-500">{errors.condicao.message as string}</span>}
-              </div>
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="tipo" className="text-base font-medium">Tipo</Label>
-                <Controller name="tipo" control={control} render={({ field }) => (
-                  <Select value={field.value ?? undefined} onValueChange={field.onChange}>
-                    <SelectTrigger className="h-12 rounded-xl" id="tipo">
-                      <SelectValue placeholder="Selecione" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {tipos.map((opt) => (
-                        <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                )}/>
-                {errors.tipo && <span id="tipo-error" className="text-sm text-red-500">{errors.tipo.message as string}</span>}
-              </div>
-              {anuncio.categoria_id && (
-                <div className="space-y-2">
-                  <Label htmlFor="categoria_id" className="text-base font-medium">Categoria</Label>
-                  <Controller name="categoria_id" control={control} render={({ field }) => (
-                    <Select value={field.value != undefined && field.value !== null ? String(field.value) : undefined} onValueChange={(v) => field.onChange(Number(v))}>
-                      <SelectTrigger className="h-12 rounded-xl" id="categoria_id">
-                        <SelectValue placeholder="Selecione" />
-                      </SelectTrigger>
+                <Label className="text-base font-medium">Condição</Label>
+                <Controller
+                  name="condicao"
+                  control={control}
+                  render={({ field }) => (
+                    <Select value={field.value ?? undefined} onValueChange={field.onChange}>
+                      <SelectTrigger className="h-12 rounded-xl"><SelectValue placeholder="Selecione" /></SelectTrigger>
                       <SelectContent>
-                        {categorias.map((c) => (
-                          <SelectItem key={c.id} value={String(c.id)}>{c.icon} {c.nome}</SelectItem>
+                        {condicoes.map((opt) => (
+                          <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
-                  )}/>
-                  {errors.categoria_id && <span id="categoria_id-error" className="text-sm text-red-500">{errors.categoria_id.message as string}</span>}
+                  )}
+                />
+                {errors.condicao && <span className="text-sm text-red-500">{errors.condicao.message}</span>}
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label className="text-base font-medium">Tipo</Label>
+                <Controller
+                  name="tipo"
+                  control={control}
+                  render={({ field }) => (
+                    <Select value={field.value ?? undefined} onValueChange={field.onChange}>
+                      <SelectTrigger className="h-12 rounded-xl"><SelectValue placeholder="Selecione" /></SelectTrigger>
+                      <SelectContent>
+                        {tipos.map((opt) => (
+                          <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
+                />
+                {errors.tipo && <span className="text-sm text-red-500">{errors.tipo.message}</span>}
+              </div>
+
+              {anuncio.categoria_id && (
+                <div className="space-y-2">
+                  <Label className="text-base font-medium">Categoria</Label>
+                  <Controller
+                    name="categoria_id"
+                    control={control}
+                    render={({ field }) => (
+                      <Select
+                        value={field.value != null ? String(field.value) : undefined}
+                        onValueChange={(v) => field.onChange(Number(v))}
+                      >
+                        <SelectTrigger className="h-12 rounded-xl"><SelectValue placeholder="Selecione" /></SelectTrigger>
+                        <SelectContent>
+                          {categorias.map((c) => (
+                            <SelectItem key={c.id} value={String(c.id)}>
+                              {c.icon} {c.nome}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    )}
+                  />
+                  {errors.categoria_id && (
+                    <span className="text-sm text-red-500">{errors.categoria_id.message}</span>
+                  )}
                 </div>
               )}
             </div>
+
             <div className="space-y-2">
               <Label htmlFor="descricao" className="text-base font-medium">Descrição</Label>
-              <Textarea id="descricao" placeholder="Descreva o brinquedo, seu estado e detalhes importantes..." className="min-h-[120px] rounded-xl resize-none" {...register("descricao")} required aria-invalid={!!errors.descricao} aria-describedby={errors.descricao ? "descricao-error" : undefined} />
-              {errors.descricao && <span id="descricao-error" className="text-sm text-red-500">{errors.descricao.message}</span>}
+              <Textarea id="descricao" className="min-h-[120px] rounded-xl resize-none" {...register("descricao")} required />
+              {errors.descricao && <span className="text-sm text-red-500">{errors.descricao.message}</span>}
             </div>
           </div>
-          <Button disabled={updateAnuncio.isPending} className="w-full h-14 text-base font-semibold dark:text-white mt-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300" type="submit">
+
+          <Button
+            disabled={updateAnuncio.isPending}
+            className="w-full h-14 text-base font-semibold dark:text-white mt-6 rounded-xl shadow-lg"
+            type="submit"
+          >
             {updateAnuncio.isPending ? (
               <span className="flex items-center gap-2">
                 <Loader2 className="animate-spin h-5 w-5" /> Salvando...
@@ -321,6 +362,7 @@ export default function AnuncioPage() {
             )}
           </Button>
         </div>
+
         <div className="fixed bottom-0 w-full flex justify-center">
           <BottomNav />
         </div>
