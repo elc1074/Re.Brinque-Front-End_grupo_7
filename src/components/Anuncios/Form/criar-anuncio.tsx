@@ -101,14 +101,14 @@ export default function CriarAnuncioForm({
 
     for (let index = 0; index < files.length; index++) {
       const file = files[index];
-      const aprovada = await moderarImagem(file);
-
+      //const aprovada = await moderarImagem(file);
+      /*
       if (!aprovada) {
         toast.error(`Imagem ${index + 1} bloqueada por conteúdo impróprio`);
         await new Promise((resolve) => setTimeout(resolve, 1000)); // espera 1 segundo
         return null;
       }
-
+      */
       const formData = new FormData();
       formData.append("file", file);
       formData.append("upload_preset", config.uploadPreset);
