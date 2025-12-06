@@ -143,31 +143,24 @@ export default function AnuncioPage() {
     return aprovadas;
   }
 
-  const [isSubmitting, setIsSubmitting] = useState(false);
-
   async function onSubmit(data: CriarAnuncioSchemaType) {
-    if (isSubmitting || updateAnuncio.isPending) return;
-    setIsSubmitting(true);
     try {
       const textoParaModerar = `${data.titulo}\n\n${data.descricao}\n\n${data.marca ?? ""}`;
       const textoAprovado = await moderarTexto(textoParaModerar);
 
       if (!textoAprovado) {
         toast.error("O texto contém conteúdo impróprio. Revise o anúncio.");
-        setIsSubmitting(false);
         return;
       }
 
       const imagensAprovadas = await verificarImagensExistentes(imagens);
 
       if (!imagensAprovadas) {
-        setIsSubmitting(false);
         return;
       }
 
       if (imagensAprovadas.length === 0) {
         toast.error("Nenhuma imagem válida foi enviada.");
-        setIsSubmitting(false);
         return;
       }
 
@@ -186,16 +179,13 @@ export default function AnuncioPage() {
 
       if (result?.error) {
         toast.error(result.error);
-        setIsSubmitting(false);
         return;
       }
 
       toast.success("Anúncio atualizado com sucesso!");
-      setIsSubmitting(false);
       router.back();
     } catch (e: any) {
       toast.error(e.message || "Erro inesperado ao atualizar o anúncio.");
-      setIsSubmitting(false);
     }
   }
 
@@ -357,7 +347,7 @@ export default function AnuncioPage() {
           </div>
 
           <Button
-            disabled={isSubmitting || updateAnuncio.isPending}
+            disabled={updateAnuncio.isPending}
             className="w-full h-14 text-base font-semibold dark:text-white mt-6 rounded-xl shadow-lg"
             type="submit"
           >
