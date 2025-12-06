@@ -157,7 +157,7 @@ export default function AnuncioPage() {
         setIsSubmitting(false);
         return;
       }
-
+      /*
       const imagensAprovadas = await verificarImagensExistentes(imagens);
 
       if (!imagensAprovadas) {
@@ -170,12 +170,12 @@ export default function AnuncioPage() {
         setIsSubmitting(false);
         return;
       }
-
-      const imagensPayload = imagensAprovadas.map((url, idx) => ({
+      */
+      const imagensPayload = imagens.map((url, idx) => ({
         url_imagem: url,
         principal: idx === 0,
       }));
-
+      
       const payload = {
         ...data,
         categoria_id: data.categoria_id ?? undefined,
