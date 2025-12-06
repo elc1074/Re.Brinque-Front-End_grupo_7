@@ -19,7 +19,6 @@ import PreviewFotos from "./preview-image";
 import { useCloudinaryConfig } from "@/hooks/useCloudinaryConfig";
 import { moderarTexto } from "@/lib/moderarTexto";
 
-
 const categorias = [
   { id: 1, nome: "Artísticos", icon: "🎨" },
   { id: 2, nome: "Aventura", icon: "🏔️" },
