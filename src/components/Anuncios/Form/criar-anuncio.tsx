@@ -148,7 +148,11 @@ export default function CriarAnuncioForm({
   const storedLocation = localStorage.getItem("userLocation");
   console.log("Location usada no anúncio:", storedLocation);
 
-  const onSubmit = async (values: CriarAnuncioFormType): Promise<void> => {    
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const onSubmit = async (values: CriarAnuncioFormType): Promise<void> => {
+    setIsSubmitting(true);
+    
     try {
       const textoParaModerar = `${values.titulo}\n\n${values.descricao}\n\n${values.marca ?? ""}`;
       const textoAprovado = await moderarTexto(textoParaModerar);
@@ -156,6 +160,7 @@ export default function CriarAnuncioForm({
       if (!textoAprovado) {
         toast.error("Algum campo contém conteúdo impróprio. Revise o texto digitado.");
         setStep(2);
+        setIsSubmitting(false);
         return;
       }
 
@@ -168,6 +173,7 @@ export default function CriarAnuncioForm({
       if (!imagens || imagens.length === 0) {
         await new Promise((resolve) => setTimeout(resolve, 1000)); // espera o toast aparecer
         setStep(1); 
+        setIsSubmitting(false);
         return;
       }
 
@@ -207,15 +213,18 @@ export default function CriarAnuncioForm({
 
       if (result?.error) {
         toast.error(result.error);
+        setIsSubmitting(false);
         return;
       }
 
       toast.success("Anúncio criado com sucesso!");
+      setIsSubmitting(false);
       router.push("/tela-inicial");
     } catch (e: any) {
       toast.dismiss();
       console.error("Erro ao criar anúncio:", e);
       toast.error(e.message || "Erro ao criar anúncio");
+      setIsSubmitting(false);
     }
   };
 
@@ -477,16 +486,16 @@ export default function CriarAnuncioForm({
       <div className="p-6">
         {step === 7 ? (
           <Button
-            disabled={!canProceed() || isPending}
+            disabled={!canProceed() || isPending || isSubmitting}
             className="w-full h-12 text-base font-medium dark:text-white mb-4"
             type="submit"
           >
-            {isPending ? "Criando..." : "Criar Anúncio"}
+            {isPending || isSubmitting ? "Criando..." : "Criar Anúncio"}
           </Button>
         ) : (
           <Button
             onClick={handleNext}
-            disabled={!canProceed() || isPending}
+            disabled={!canProceed() || isPending || isSubmitting}
             className="w-full h-12 text-base font-medium dark:text-white mb-4"
             type="button"
           >
